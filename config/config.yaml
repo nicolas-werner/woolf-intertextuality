@@ -1,0 +1,23 @@
+preprocessing:
+  # Chunking strategy
+  strategy: "sentence"  # Options: "sentence", "paragraph"
+  chunk_size: 4        # Number of sentences per chunk if strategy is "sentence"
+  chunk_overlap: 1     # Number of sentences to overlap
+  include_context_header: true
+
+embeddings:
+  model_name: "text-embedding-3-small"
+  dimension: 1536
+
+vector_store:
+  host: "localhost"
+  port: 6333
+  collection_name: "literature"
+
+texts:
+  dalloway:
+    raw_path: "data/raw/mrs_dalloway.txt"
+    query_path: "data/processed/mrs_dalloway_queries.jsonl"
+  odyssey:
+    raw_path: "data/raw/odyssey_butcher.txt"
+    processed_path: "data/processed/odyssey_processed.jsonl"

@@ -1,0 +1,9 @@
+farm-haystack>=1.0.0
+qdrant-haystack
+openai>=1.0.0
+rich
+python-dotenv
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+
