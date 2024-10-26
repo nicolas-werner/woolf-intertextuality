@@ -17,7 +17,7 @@ from src.prompts.intertextual_analysis import (
 console = Console()
 
 class IntertextualityPipeline:
-    def __init__(self):
+    def __init__(self, use_scholarly_prompt: bool = True):
         self.vector_store = QdrantManager(
             embedding_dim=settings.embeddings.dimension
         )
@@ -27,7 +27,7 @@ class IntertextualityPipeline:
         )
         
         self.setup_pipelines()
-        self.system_prompt = load_system_prompt()
+        self.system_prompt = load_system_prompt(scholarly=use_scholarly_prompt)
         self.client = OpenAI(api_key=settings.openai_api_key)
 
     def setup_pipelines(self):

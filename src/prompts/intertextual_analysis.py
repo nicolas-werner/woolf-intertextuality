@@ -1,15 +1,22 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 from pydantic import BaseModel, Field
 from enum import Enum
 from pathlib import Path
 
 class ReferenceType(str, Enum):
-    THEMATIC = "thematic"
-    CHARACTER = "character"
-    STRUCTURAL = "structural"
-    STYLISTIC = "stylistic"
-    MOTIF = "motif"
-    NONE = "none"
+    QUOTATION = "quotation"          # Direct textual borrowing
+    ALLUSION = "allusion"            # Indirect reference
+    STRUCTURAL = "structural"        # Similar narrative patterns
+    DIALOGIC = "dialogic"           # Text responding to or in dialogue with other text
+    TRANSFORMATION = "transformation" # Rewriting or reimagining of themes/motifs
+    NONE = "none"                   # No meaningful intertextual relationship
+
+class TextualCode(str, Enum):
+    LITERARY = "literary"           # Literary conventions and traditions
+    CULTURAL = "cultural"           # Cultural codes and contexts
+    SOCIAL = "social"              # Social norms and structures
+    HISTORICAL = "historical"       # Historical context and references
+    LINGUISTIC = "linguistic"       # Language patterns and structures
 
 class ConfidenceLevel(str, Enum):
     HIGH = "high"          # Strong evidence and clear connections
@@ -18,15 +25,19 @@ class ConfidenceLevel(str, Enum):
     UNCERTAIN = "uncertain" # Not enough evidence to make a determination
 
 class IntertextualReference(BaseModel):
-    """Represents a potential intertextual reference between two texts"""
+    """Represents a potential intertextual reference based on Kristeva's theory"""
     is_reference: bool = Field(
         description="Whether this similarity represents a meaningful intertextual reference"
     )
     reference_type: ReferenceType = Field(
-        description="The type of intertextual reference if present"
+        description="The type of intertextual relationship present"
+    )
+    textual_codes: Set[TextualCode] = Field(
+        description="The types of codes/systems through which the texts interact",
+        min_items=1
     )
     explanation: str = Field(
-        description="Detailed explanation of why this is or isn't an intertextual reference"
+        description="Detailed explanation of the intertextual relationship"
     )
     confidence: ConfidenceLevel = Field(
         description="Qualitative assessment of confidence in the reference identification"
@@ -35,26 +46,32 @@ class IntertextualReference(BaseModel):
         description="Specific textual evidence supporting the reference",
         min_items=1
     )
+    transformation: str = Field(
+        description="How Woolf transforms or recontextualizes the Homeric text"
+    )
 
 class AnalysisThoughtProcess(BaseModel):
     """Represents the Chain of Thought reasoning process"""
     initial_observation: str = Field(
-        description="Initial observation about the similarity between the passages"
+        description="Initial observation about textual similarities"
     )
     contextual_analysis: str = Field(
-        description="Analysis of the context of both passages"
+        description="Analysis of historical and cultural contexts of both passages"
     )
-    literary_devices: List[str] = Field(
-        description="Literary devices or techniques identified in both passages"
+    code_identification: List[str] = Field(
+        description="Identification of shared textual codes and systems"
     )
-    thematic_connections: List[str] = Field(
-        description="Potential thematic connections between the passages"
+    dialogic_analysis: str = Field(
+        description="How the texts engage in dialogue with each other"
+    )
+    transformation_analysis: str = Field(
+        description="How Woolf transforms or reinterprets Homeric elements"
     )
     counter_arguments: List[str] = Field(
         description="Possible arguments against this being an intertextual reference"
     )
     synthesis: str = Field(
-        description="Final synthesis of the analysis"
+        description="Final synthesis of the intertextual analysis"
     )
 
 class IntertextualAnalysis(BaseModel):
@@ -66,9 +83,11 @@ class IntertextualAnalysis(BaseModel):
         description="The identified intertextual reference"
     )
 
-def load_system_prompt() -> str:
+def load_system_prompt(scholarly: bool = False) -> str:
     """Load the system prompt from file"""
-    prompt_path = Path(__file__).parent / "system_prompt.txt"
+    prompt_path = Path(__file__).parent / (
+        "system_prompt_scholarly.txt" if scholarly else "system_prompt.txt"
+    )
     with open(prompt_path, 'r', encoding='utf-8') as f:
         return f.read().strip()
 
