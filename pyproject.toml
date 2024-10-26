@@ -1,0 +1,17 @@
+[project]
+name = "woolf-intertextuality"
+version = "0.1.0"
+description = "Detecting intertextuality between Mrs Dalloway and The Odyssey using RAG"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "qdrant-client",
+    "sentence-transformers",
+    "openai",
+    "transformers",
+    "torch",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "nltk",
+]
