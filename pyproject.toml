@@ -14,4 +14,9 @@ dependencies = [
     "pandas",
     "matplotlib",
     "nltk",
+    "pydantic-settings>=2.6.1",
+    "pydantic>=2.9.2",
+    "qdrant-haystack>=7.0.0",
+    "haystack-ai>=2.7.0",
+    "rich>=13.9.4",
 ]

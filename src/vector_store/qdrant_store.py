@@ -1,16 +1,22 @@
 from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
-from haystack.schema import Document
-from typing import List
+from haystack import Document
+from typing import List, Optional
+from pathlib import Path
+import json
 from rich.console import Console
 from src.config.settings import settings
 
 console = Console()
 
 class QdrantManager:
-    def __init__(self, embedding_dim: int = settings.embeddings.dimension):
+    def __init__(self, 
+                 embedding_dim: int = settings.embeddings.dimension):
+        """Initialize QdrantManager"""
         self.document_store = QdrantDocumentStore(
-            ":memory:",  # Use in-memory storage
-            recreate_index=True,
+            path=":memory:",  # Always use in-memory
+            recreate_index=True,  # Always create fresh index
+            return_embedding=True,
+            wait_result_from_api=True,
             embedding_dim=embedding_dim
         )
     
@@ -18,7 +24,9 @@ class QdrantManager:
         """Add documents to the store"""
         console.log("📚 Adding documents to vector store")
         self.document_store.write_documents(documents)
-        
+        console.log("[bold green]✅ Documents added successfully![/bold green]")
+        return documents
+    
     def search(self, query: str, top_k: int = 5) -> List[Document]:
-        """Search for similar documents"""
+        """Search for top k similar text chunks"""
         return self.document_store.query(query, top_k=top_k)

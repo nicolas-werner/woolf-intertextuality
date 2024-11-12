@@ -1,14 +1,36 @@
 import os
+import argparse
 from pathlib import Path
 from haystack import Document
 from rich.console import Console
 import pandas as pd
-from pipeline.intertextuality_pipeline import IntertextualityPipeline
-from data_preparation.data_manager import DataManager
+from datetime import datetime
+from src.pipeline.intertextuality_pipeline import IntertextualityPipeline
+from src.data_preparation.data_manager import DataManager
 
 console = Console()
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Analyze intertextual references between Mrs Dalloway and The Odyssey"
+    )
+    parser.add_argument(
+        "--limit", 
+        type=int, 
+        help="Limit the number of Dalloway queries to process",
+        default=None
+    )
+    return parser.parse_args()
+
+def get_timestamped_filename(base_name: str) -> str:
+    """Create filename with ISO timestamp suffix"""
+    timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
+    name, ext = os.path.splitext(base_name)
+    return f"{name}_{timestamp}{ext}"
+
 def main():
+    args = parse_args()
+    
     # Initialize components
     data_manager = DataManager()
     pipeline = IntertextualityPipeline()
@@ -17,6 +39,11 @@ def main():
     console.log("📚 Loading and preparing documents")
     query_chunks, odyssey_docs = data_manager.load_data()
     
+    # Apply limit if specified
+    if args.limit:
+        console.log(f"[yellow]Limiting analysis to first {args.limit} queries[/yellow]")
+        query_chunks = query_chunks[:args.limit]
+    
     # Index Odyssey documents
     pipeline.index_documents(odyssey_docs)
     
@@ -24,12 +51,15 @@ def main():
     results = []
     
     # Process each chunk from Mrs Dalloway
-    console.print("\n[bold]Analyzing Mrs Dalloway chunks:[/bold]")
-    for i, query in enumerate(query_chunks, 1):
-        console.print(f"\n[cyan]Query chunk {i}:[/cyan] {query[:100]}...")
+    total_queries = len(query_chunks)
+    console.print(f"\n[bold]Analyzing {total_queries} Mrs Dalloway chunks:[/bold]")
+    
+    for i, query_doc in enumerate(query_chunks, 1):
+        query_text = query_doc.content
+        console.print(f"\n[cyan]Query {i}/{total_queries}:[/cyan] {query_text[:100]}...")
         
         # Find similar passages
-        similar_docs = pipeline.find_similar_passages(query)
+        similar_docs = pipeline.find_similar_passages(query_text)
         
         # Analyze each similar passage
         for doc in similar_docs:
@@ -38,11 +68,11 @@ def main():
             console.print(f"[green]Score:[/green] {doc.score:.4f}")
             
             # Perform intertextual analysis
-            analysis = pipeline.analyze_similarity(query, doc)
+            analysis = pipeline.analyze_similarity(query_text, doc)
             
             # Store results
             result = {
-                'dalloway_text': query,
+                'dalloway_text': query_text,
                 'odyssey_text': doc.content,
                 'odyssey_chapter': doc.meta['chapter'],
                 'similarity_score': doc.score,
@@ -72,10 +102,11 @@ def main():
                 console.print(f"[cyan]Explanation:[/cyan] {analysis.reference.explanation}")
             console.print("\n" + "="*80 + "\n")
     
-    # Save results to CSV
+    # Save results to CSV with timestamp
     output_dir = Path("data/results")
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / "intertextual_analysis.csv"
+    output_filename = get_timestamped_filename("intertextual_analysis.csv")
+    output_path = output_dir / output_filename
     
     df = pd.DataFrame(results)
     df.to_csv(output_path, index=False, encoding='utf-8')

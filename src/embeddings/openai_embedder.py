@@ -1,29 +1,61 @@
-from haystack.nodes.retriever import EmbeddingRetriever
-from openai import OpenAI
-from typing import List, Union, Any
+from haystack import Document
+from haystack.components.embedders import OpenAITextEmbedder, OpenAIDocumentEmbedder
+from typing import List, Dict
 from src.config.settings import settings
+from pathlib import Path
+import numpy as np
+from rich.console import Console
 
-class OpenAIEmbeddingRetriever(EmbeddingRetriever):
-    def __init__(self, document_store: Any) -> None:
-        self.client = OpenAI(api_key=settings.openai_api_key)
-        self.document_store = document_store
-        self.model_name = settings.embeddings.model_name
+console = Console()
+
+class OpenAIEmbedder:
+    """Handles document embedding using OpenAI's embedding models."""
+    
+    def __init__(self, document_store=None):
+        """Initialize embedder
         
-    def embed(self, text: Union[str, List[str]]) -> List[float]:
-        """Get embeddings from OpenAI API"""
-        if isinstance(text, list):
-            return self.embed_batch(text)
-            
-        response = self.client.embeddings.create(
-            model=self.model_name,
-            input=text
+        Args:
+            document_store: Document store for storing and retrieving embeddings
+        """
+        self.document_store = document_store
+        
+        # Common configuration for embedders
+        embedder_config = {
+            "model": settings.embeddings.api_model
+        }
+        
+        # Initialize embedders
+        self.document_embedder = OpenAIDocumentEmbedder(**embedder_config)
+        self.text_embedder = OpenAITextEmbedder(**embedder_config)
+    
+    def embed_documents(self, documents: List[Document]) -> List[Document]:
+        """Embed documents that don't have embeddings"""
+        docs_to_embed = []
+        embedded_docs = []
+        
+        for doc in documents:
+            if doc.embedding is not None:
+                embedded_docs.append(doc)
+                console.log("[green]Using cached embedding[/green]")
+            else:
+                docs_to_embed.append(doc)
+        
+        if docs_to_embed:
+            console.log(f"Embedding {len(docs_to_embed)} new documents...")
+            newly_embedded = self.document_embedder.run(documents=docs_to_embed)
+            embedded_docs.extend(newly_embedded["documents"])
+        else:
+            console.log("[bold green]All documents already have embeddings![/bold green]")
+        
+        return embedded_docs
+    
+    def find_similar(self, query: str, top_k: int = 5) -> List[Document]:
+        """Find similar documents for a query"""
+        query_result = self.text_embedder.run(text=query)
+        return self.document_store._query_by_embedding(
+            query_embedding=query_result["embedding"],
+            top_k=top_k,
+            return_embedding=True,
+            filters=None,
+            scale_score=True
         )
-        return response.data[0].embedding
-
-    def embed_batch(self, texts: List[str]) -> List[List[float]]:
-        """Get embeddings for a batch of texts"""
-        response = self.client.embeddings.create(
-            model=self.model_name,
-            input=texts
-        )
-        return [data.embedding for data in response.data]

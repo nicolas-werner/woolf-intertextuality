@@ -14,13 +14,27 @@ class PreprocessingSettings(BaseSettings):
     include_context_header: bool = True
 
 class EmbeddingSettings(BaseSettings):
-    model_name: str = "text-embedding-3-small"
+    api_model: str = "text-embedding-3-small"
     dimension: int = 1536
+
+    class Config:
+        protected_namespaces = ('settings_',)
+
+class LLMSettings(BaseSettings):
+    model: str = "gpt-4o-mini"
+    temperature: float = 0
+    max_tokens: int = 2000
+
+    class Config:
+        protected_namespaces = ('settings_',)
 
 class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str
 
+    # LLM settings
+    llm: LLMSettings = LLMSettings()
+    
     # Preprocessing settings
     preprocessing: PreprocessingSettings = PreprocessingSettings()
     
@@ -37,6 +51,12 @@ class Settings(BaseSettings):
             raw_path="data/raw/odyssey_butcher.txt",
             processed_path="data/processed/odyssey_processed.jsonl"
         )
+    }
+
+    # Storage settings
+    storage: Dict[str, Path] = {
+        "persist_dir": Path("data/persisted"),
+        "embeddings_dir": Path("data/persisted/embeddings")
     }
 
     class Config:

@@ -11,49 +11,78 @@ class PreprocessedDataStore:
     def __init__(self, storage_type: str = "jsonl"):
         self.storage_type = storage_type
         
-    def save_chunks(self, chunks: List[Dict], output_path: str) -> None:
-        """Save preprocessed chunks with their metadata"""
+    def save_chunks(self, documents: Union[List[Document], List[Dict]], output_path: str) -> None:
+        """Save preprocessed chunks with their metadata and embeddings"""
         console.log(f"💾 Saving chunks to: {output_path}")
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         
-        with open(output_path, 'w', encoding='utf-8') as f:
-            for chunk in chunks:
-                # Convert numpy arrays to lists for JSON serialization if present
-                if 'embedding' in chunk and isinstance(chunk['embedding'], np.ndarray):
-                    chunk['embedding'] = chunk['embedding'].tolist()
-                json.dump(chunk, f)
-                f.write('\n')
+        total_with_embeddings = 0
+        with open(output_path, 'w', encoding='utf-8', errors='replace') as f:
+            for doc in documents:
+                # Handle both Document objects and dictionaries
+                if isinstance(doc, Document):
+                    doc_dict = {
+                        "content": doc.content,
+                        "meta": doc.meta,
+                    }
+                    # Check for embedding
+                    if hasattr(doc, 'embedding') and doc.embedding is not None:
+                        if isinstance(doc.embedding, np.ndarray):
+                            doc_dict["embedding"] = doc.embedding.tolist()
+                            total_with_embeddings += 1
+                        else:
+                            doc_dict["embedding"] = doc.embedding
+                            total_with_embeddings += 1
+                        console.log(f"[green]Saving document with embedding of size {len(doc.embedding)}[/green]")
+                else:
+                    doc_dict = doc
+                    if 'embedding' in doc_dict:
+                        total_with_embeddings += 1
+                
+                json_str = json.dumps(doc_dict, ensure_ascii=False)
+                f.write(json_str + '\n')
         
-        console.log(f"[bold green]✅ Saved {len(chunks)} chunks![/bold green]")
+        console.log(f"[bold green]✅ Saved {len(documents)} chunks ({total_with_embeddings} with embeddings)![/bold green]")
     
-    def load_chunks(self, input_path: str) -> Union[List[str], List[Document]]:
-        """Load preprocessed chunks. Returns Documents for Odyssey, strings for Dalloway"""
+    def load_chunks(self, input_path: str) -> List[Document]:
+        """Load preprocessed chunks with embeddings"""
         console.log(f"📖 Loading chunks from: {input_path}")
         
-        if 'dalloway' in input_path:
-            # For Dalloway queries, just return the content
-            queries = []
-            with open(input_path, 'r', encoding='utf-8') as f:
-                for line in f:
+        documents = []
+        total_with_embeddings = 0
+        
+        with open(input_path, 'r', encoding='utf-8', errors='replace') as f:
+            for line_num, line in enumerate(f, 1):
+                try:
                     chunk = json.loads(line)
-                    queries.append(chunk['content'])
-            console.log(f"[bold green]✅ Loaded {len(queries)} query chunks![/bold green]")
-            return queries
-        else:
-            # For Odyssey, return full Documents
-            documents = []
-            with open(input_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    chunk = json.loads(line)
+                    content = chunk.get('content', chunk.get('text', ''))
+                    meta = chunk.get('meta', {})
+                    
+                    # Convert embedding back to numpy array if it exists
+                    embedding = None
                     if 'embedding' in chunk:
-                        chunk['embedding'] = np.array(chunk['embedding'])
+                        embedding = np.array(chunk['embedding'])
+                        total_with_embeddings += 1
+                        console.log(f"[green]Found cached embedding of size {len(embedding)} in chunk {line_num}[/green]")
+                    
                     documents.append(Document(
-                        content=chunk['content'],
-                        meta=chunk.get('metadata', {}),
-                        embedding=chunk.get('embedding')
+                        content=content,
+                        meta=meta,
+                        embedding=embedding
                     ))
-            console.log(f"[bold green]✅ Loaded {len(documents)} document chunks![/bold green]")
-            return documents
+                except Exception as e:
+                    console.log(f"[red]Error loading chunk {line_num}: {str(e)}[/red]")
+        
+        console.log(f"[bold green]✅ Loaded {len(documents)} chunks ({total_with_embeddings} with embeddings)![/bold green]")
+        
+        # Validate embeddings
+        for i, doc in enumerate(documents):
+            if doc.embedding is not None:
+                console.log(f"[green]Chunk {i+1} has embedding of size {len(doc.embedding)}[/green]")
+            else:
+                console.log(f"[yellow]Warning: Chunk {i+1} has no embedding[/yellow]")
+        
+        return documents
 
     def merge_files(self, input_paths: List[str], output_path: str) -> None:
         """Merge multiple JSONL files into one"""
