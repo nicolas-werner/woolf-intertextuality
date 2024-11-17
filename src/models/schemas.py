@@ -3,59 +3,62 @@ from pydantic import BaseModel, Field
 
 ConfidenceLevel = Literal["low", "medium", "high"]
 
+class TextualIntersection(BaseModel):
+    """Represents how texts intersect and transform each other"""
+    surface_elements: List[str] = Field(
+        description="Textual elements where the texts intersect (words, themes, structures, motifs)"
+    )
+    transformation: str = Field(
+        description="How Mrs. Dalloway absorbs and transforms elements from The Odyssey"
+    )
+    dialogic_aspects: str = Field(
+        description="How the texts engage in dialogue with each other and create new meanings"
+    )
+    differential_meaning: str = Field(
+        description="How meanings transform across historical and cultural contexts"
+    )
+
 class AnalysisThoughtProcess(BaseModel):
     """Chain of thought reasoning process for intertextual analysis"""
     initial_observation: str = Field(
-        description="Initial observations about textual similarities, including linguistic echoes, thematic resonances, and structural parallels"
+        description="Initial observations about textual similarities and resonances"
     )
-    contextual_analysis: str = Field(
-        description="Analysis of how each text functions within its historical, cultural, and literary context, and how these contexts interact"
+    textual_intersections: List[TextualIntersection] = Field(
+        description="Analysis of specific points where texts intersect and transform"
     )
-    code_identification: List[str] = Field(
-        description="Identification of shared literary codes, cultural references, and semiotic systems between the texts"
+    historical_context: str = Field(
+        description="How each text functions within its historical and cultural context"
     )
-    dialogic_analysis: str = Field(
-        description="Analysis of how the texts engage in dialogue with each other, including how meaning is transformed across contexts"
+    differential_analysis: str = Field(
+        description="How meanings and significance change across contexts"
     )
-    transformation_analysis: str = Field(
-        description="Analysis of how Woolf's text transforms, subverts, or reinterprets elements from The Odyssey"
-    )
-    counter_arguments: List[str] = Field(
-        description="Potential arguments against the intertextual connection, considering alternative interpretations"
+    relational_process: str = Field(
+        description="How meaning emerges through the relationship between texts"
     )
     synthesis: str = Field(
-        description="Final synthesis of how the texts create meaning through their interaction and dialogue"
+        description="Final synthesis of how the texts create meaning through interaction"
     )
 
 class IntertextualReference(BaseModel):
-    """Details of an identified intertextual reference and its characteristics"""
-    is_reference: bool = Field(
+    """Analysis of the intertextual relationship between text passages"""
+    is_meaningful: bool = Field(
         description="Whether the textual relationship constitutes a meaningful intertextual connection"
     )
-    reference_type: str = Field(
-        description="Type of intertextual reference (e.g., allusion, quotation, parody, pastiche, structural echo, thematic parallel)"
-    )
     confidence: ConfidenceLevel = Field(
-        description="Confidence in the intertextual identification based on textual evidence and scholarly context"
+        description="Confidence in the intertextual identification based on similarity and evidence"
     )
-    textual_codes: List[str] = Field(
-        description="Literary and cultural codes shared between the texts, including narrative techniques, motifs, and symbolic systems"
-    )
-    explanation: str = Field(
-        description="Detailed explanation of how the texts interact and create meaning through their relationship"
-    )
-    transformation: str = Field(
-        description="Analysis of how Woolf's modernist text transforms classical elements for contemporary meaning"
+    intersections: List[TextualIntersection] = Field(
+        description="Points where the texts intersect and transform each other"
     )
     supporting_evidence: List[str] = Field(
-        description="Textual evidence supporting the intertextual connection, including linguistic, thematic, and structural parallels"
+        description="Textual evidence supporting the intertextual connection"
     )
 
 class IntertextualAnalysis(BaseModel):
     """Complete analysis of intertextual relationships between text passages"""
     thought_process: AnalysisThoughtProcess = Field(
-        description="Detailed chain of thought analysis examining the intertextual relationship"
+        description="Chain of thought analysis examining the intertextual relationship"
     )
     reference: IntertextualReference = Field(
-        description="Structured analysis of the identified intertextual connection and its characteristics"
-    ) 
+        description="Structured analysis of the identified intertextual connection"
+    )

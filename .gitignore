@@ -3,3 +3,5 @@ data/processed/*
 data/results/*
 __pycache__
 .DS_Store
+notes/paper_structure.md
+notes/prompt_engineering_and_model_selection.md

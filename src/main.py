@@ -76,30 +76,36 @@ def main():
                 'odyssey_text': doc.content,
                 'odyssey_chapter': doc.meta['chapter'],
                 'similarity_score': doc.score,
-                'is_reference': analysis.reference.is_reference,
-                'reference_type': analysis.reference.reference_type,
-                'confidence': analysis.reference.confidence,
-                'textual_codes': ','.join(sorted(analysis.reference.textual_codes)),
-                'explanation': analysis.reference.explanation,
-                'transformation': analysis.reference.transformation,
-                'supporting_evidence': ';'.join(analysis.reference.supporting_evidence),
+                # Thought Process
                 'initial_observation': analysis.thought_process.initial_observation,
-                'contextual_analysis': analysis.thought_process.contextual_analysis,
-                'code_identification': ','.join(analysis.thought_process.code_identification),
-                'dialogic_analysis': analysis.thought_process.dialogic_analysis,
-                'transformation_analysis': analysis.thought_process.transformation_analysis,
-                'counter_arguments': ','.join(analysis.thought_process.counter_arguments),
-                'synthesis': analysis.thought_process.synthesis
+                'historical_context': analysis.thought_process.historical_context,
+                'differential_analysis': analysis.thought_process.differential_analysis,
+                'relational_process': analysis.thought_process.relational_process,
+                'synthesis': analysis.thought_process.synthesis,
+                # Reference
+                'is_meaningful': analysis.reference.is_meaningful,
+                'confidence': analysis.reference.confidence,
+                'supporting_evidence': ';'.join(analysis.reference.supporting_evidence),
+                # Textual Intersections
+                'intersections': [
+                    {
+                        'surface_elements': ';'.join(intersection.surface_elements),
+                        'transformation': intersection.transformation,
+                        'dialogic_aspects': intersection.dialogic_aspects,
+                        'differential_meaning': intersection.differential_meaning
+                    }
+                    for intersection in analysis.reference.intersections
+                ]
             }
             results.append(result)
             
             # Print analysis results
             console.print("\n[bold blue]Analysis:[/bold blue]")
-            console.print(f"[cyan]Is Reference:[/cyan] {analysis.reference.is_reference}")
-            if analysis.reference.is_reference:
-                console.print(f"[cyan]Type:[/cyan] {analysis.reference.reference_type}")
+            console.print(f"[cyan]Is Meaningful:[/cyan] {analysis.reference.is_meaningful}")
+            if analysis.reference.is_meaningful:
                 console.print(f"[cyan]Confidence:[/cyan] {analysis.reference.confidence}")
-                console.print(f"[cyan]Explanation:[/cyan] {analysis.reference.explanation}")
+                console.print(f"[cyan]Initial Observation:[/cyan] {analysis.thought_process.initial_observation}")
+                console.print(f"[cyan]Synthesis:[/cyan] {analysis.thought_process.synthesis}")
             console.print("\n" + "="*80 + "\n")
     
     # Save results to CSV with timestamp
@@ -108,7 +114,18 @@ def main():
     output_filename = get_timestamped_filename("intertextual_analysis.csv")
     output_path = output_dir / output_filename
     
-    df = pd.DataFrame(results)
+    # Convert results to DataFrame, handling the nested intersections
+    df = pd.json_normalize(
+        results,
+        record_path='intersections',
+        meta=[
+            'dalloway_text', 'odyssey_text', 'odyssey_chapter', 'similarity_score',
+            'initial_observation', 'historical_context', 'differential_analysis',
+            'relational_process', 'synthesis', 'is_meaningful', 'confidence',
+            'supporting_evidence'
+        ]
+    )
+    
     df.to_csv(output_path, index=False, encoding='utf-8')
     console.print(f"\n[bold green]✅ Analysis results saved to {output_path}[/bold green]")
 
