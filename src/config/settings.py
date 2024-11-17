@@ -21,7 +21,7 @@ class EmbeddingSettings(BaseSettings):
         protected_namespaces = ('settings_',)
 
 class LLMSettings(BaseSettings):
-    model: str = "gpt-4o-mini"
+    model: str = "gpt-4o"
     temperature: float = 0
     max_tokens: int = 2000
 

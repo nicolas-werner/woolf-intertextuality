@@ -4,7 +4,7 @@ from typing import List, Tuple
 from haystack import Document
 from rich.console import Console
 
-from src.utils.text_preprocessor import TextPreprocessor
+from src.data_preparation.preprocessing import TextPreprocessor
 from src.data_preparation.preprocessed_data_store import PreprocessedDataStore
 from src.config.settings import settings
 from src.embeddings.openai_embedder import OpenAIEmbedder

@@ -19,4 +19,5 @@ dependencies = [
     "qdrant-haystack>=7.0.0",
     "haystack-ai>=2.7.0",
     "rich>=13.9.4",
+    "jinja2>=3.0.0",
 ]

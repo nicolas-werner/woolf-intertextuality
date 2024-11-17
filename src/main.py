@@ -5,7 +5,7 @@ from haystack import Document
 from rich.console import Console
 import pandas as pd
 from datetime import datetime
-from src.pipeline.intertextuality_pipeline import IntertextualityPipeline
+from src.pipeline.pipeline_facade import PipelineFacade
 from src.data_preparation.data_manager import DataManager
 
 console = Console()
@@ -33,7 +33,7 @@ def main():
     
     # Initialize components
     data_manager = DataManager()
-    pipeline = IntertextualityPipeline()
+    pipeline = PipelineFacade()
     
     # Load data
     console.log("📚 Loading and preparing documents")

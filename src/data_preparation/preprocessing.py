@@ -10,6 +10,8 @@ from src.config.settings import settings
 console = Console()
 
 class TextPreprocessor:
+    """Handles text preprocessing and chunking for both texts"""
+    
     def __init__(self):
         # Initialize text cleaner for initial raw text cleaning
         self.text_cleaner = TextCleaner(
@@ -101,4 +103,4 @@ class TextPreprocessor:
                 }
                 processed_chunks.append(doc)
 
-        return processed_chunks
+        return processed_chunks 

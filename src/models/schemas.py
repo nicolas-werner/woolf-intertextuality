@@ -1,8 +1,6 @@
 from typing import List, Literal
 from pydantic import BaseModel, Field
-from pathlib import Path
 
-# Define confidence levels as a literal type
 ConfidenceLevel = Literal["low", "medium", "high"]
 
 class AnalysisThoughtProcess(BaseModel):
@@ -60,69 +58,4 @@ class IntertextualAnalysis(BaseModel):
     )
     reference: IntertextualReference = Field(
         description="Structured analysis of the identified intertextual connection and its characteristics"
-    )
-
-def load_system_prompt(scholarly: bool = False) -> str:
-    """Load the system prompt from file"""
-    prompt_path = Path(__file__).parent / (
-        "system_prompt_scholarly.txt" if scholarly else "system_prompt.txt"
-    )
-    with open(prompt_path, 'r', encoding='utf-8') as f:
-        return f.read().strip()
-
-ANALYSIS_PROMPT = """Analyze the following passages for potential intertextual references:
-
-Mrs Dalloway passage:
-{dalloway_text}
-
-The Odyssey passage:
-{odyssey_text}
-Semantic Similarity Score: {similarity_score}
-
-Follow these steps in your analysis:
-
-1. Initial Observation:
-- Note semantic similarities in themes, motifs, or narrative patterns
-- Consider how similar meanings are expressed in different ways
-- Identify shared concepts or ideas, even if expressed differently
-
-2. Contextual Analysis:
-- Examine how each passage functions within its larger narrative
-- Consider the thematic role of each passage
-- Analyze how similar meanings serve different purposes in each text
-
-3. Literary Techniques:
-- Identify how each author conveys similar meanings through different techniques
-- Compare modernist vs. classical narrative approaches
-- Note how Woolf might transform Homeric techniques
-
-4. Thematic Resonance:
-- Analyze how similar themes are treated differently
-- Consider how Woolf might be reinterpreting Homeric themes
-- Examine how gender and social perspectives influence similar themes
-
-5. Critical Evaluation:
-- Consider whether semantic similarities suggest intentional reference
-- Evaluate if similarities reflect broader literary/cultural patterns
-- Assess whether the similarity score reflects meaningful connections
-
-6. Synthesis:
-- Determine if this represents meaningful intertextual dialogue
-- Consider how Woolf's modernist perspective transforms classical themes
-- Evaluate the significance of any semantic parallels
-
-Remember:
-- High semantic similarity doesn't always indicate intentional reference
-- Consider how similar meanings can serve different narrative purposes
-- Pay attention to how Woolf might transform classical themes
-- Consider both explicit and implicit semantic connections
-- The similarity score provides context but isn't definitive
-"""
-
-def get_analysis_prompt(dalloway_text: str, odyssey_text: str, similarity_score: float) -> str:
-    """Get the analysis prompt with the texts inserted"""
-    return ANALYSIS_PROMPT.format(
-        dalloway_text=dalloway_text,
-        odyssey_text=odyssey_text,
-        similarity_score=similarity_score
-    )
+    ) 
