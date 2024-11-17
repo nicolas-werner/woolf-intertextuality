@@ -26,17 +26,11 @@ class AnalysisThoughtProcess(BaseModel):
     textual_intersections: List[TextualIntersection] = Field(
         description="Analysis of specific points where texts intersect and transform"
     )
-    historical_context: str = Field(
-        description="How each text functions within its historical and cultural context"
-    )
-    differential_analysis: str = Field(
-        description="How meanings and significance change across contexts"
-    )
-    relational_process: str = Field(
-        description="How meaning emerges through the relationship between texts"
+    counter_arguments: List[str] = Field(
+        description="Potential arguments against the intertextual connection or alternative interpretations"
     )
     synthesis: str = Field(
-        description="Final synthesis of how the texts create meaning through interaction"
+        description="Final conclusion about how and why this Mrs. Dalloway passage functions as an intertextual reference to The Odyssey or not"
     )
 
 class IntertextualReference(BaseModel):
