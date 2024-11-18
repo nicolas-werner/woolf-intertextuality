@@ -17,7 +17,7 @@ console = Console()
 class PipelineOrchestrator:
     """Orchestrates the intertextuality analysis pipeline"""
     
-    def __init__(self, use_scholarly_prompt: bool = True):
+    def __init__(self):
         # Initialize components
         self.vector_store = QdrantManager(
             embedding_dim=settings.embeddings.dimension
@@ -28,8 +28,9 @@ class PipelineOrchestrator:
         )
         
         self.prompt_generator = PromptGenerator()
-        template_name = "system_scholarly" if use_scholarly_prompt else "system_standard"
-        self.system_prompt = self.prompt_generator.generate(template_name=template_name)
+        self.system_prompt = self.prompt_generator.generate(
+            template_name=settings.llm.prompt_template
+        )
         
         self.client = OpenAI(api_key=settings.openai_api_key)
         
@@ -59,6 +60,7 @@ class PipelineOrchestrator:
                 
             elif "query_text" in current_data and "top_k" in current_data:
                 # Similarity search flow
+                self.search_step.top_k = current_data["top_k"]
                 current_data = self.search_step.execute(current_data)
                 
             elif "query_text" in current_data and "similar_document" in current_data:

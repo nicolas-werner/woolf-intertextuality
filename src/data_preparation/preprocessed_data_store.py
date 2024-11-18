@@ -63,7 +63,7 @@ class PreprocessedDataStore:
                     if 'embedding' in chunk:
                         embedding = np.array(chunk['embedding'])
                         total_with_embeddings += 1
-                        console.log(f"[green]Found cached embedding of size {len(embedding)} in chunk {line_num}[/green]")
+                        # console.log(f"[green]Found cached embedding of size {len(embedding)} in chunk {line_num}[/green]")
                     
                     documents.append(Document(
                         content=content,
@@ -76,11 +76,11 @@ class PreprocessedDataStore:
         console.log(f"[bold green]✅ Loaded {len(documents)} chunks ({total_with_embeddings} with embeddings)![/bold green]")
         
         # Validate embeddings
-        for i, doc in enumerate(documents):
-            if doc.embedding is not None:
-                console.log(f"[green]Chunk {i+1} has embedding of size {len(doc.embedding)}[/green]")
-            else:
-                console.log(f"[yellow]Warning: Chunk {i+1} has no embedding[/yellow]")
+        # for i, doc in enumerate(documents):
+        #     if doc.embedding is not None:
+        #         console.log(f"[green]Chunk {i+1} has embedding of size {len(doc.embedding)}[/green]")
+        #     else:
+        #         console.log(f"[yellow]Warning: Chunk {i+1} has no embedding[/yellow]")
         
         return documents
 

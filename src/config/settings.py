@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from typing import Dict
+from typing import Dict, Literal
 from pathlib import Path
 
 class TextPaths(BaseSettings):
@@ -21,9 +21,10 @@ class EmbeddingSettings(BaseSettings):
         protected_namespaces = ('settings_',)
 
 class LLMSettings(BaseSettings):
-    model: str = "gpt-4o"
+    model: str = "gpt-4"
     temperature: float = 0
     max_tokens: int = 2000
+    prompt_template: Literal["expert_prompt", "naive_prompt"] = "expert_prompt"
 
     class Config:
         protected_namespaces = ('settings_',)

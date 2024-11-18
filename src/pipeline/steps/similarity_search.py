@@ -9,17 +9,18 @@ console = Console()
 class SimilaritySearchStep(PipelineStep):
     """Step for finding similar passages"""
     
-    def __init__(self, embedder: OpenAIEmbedder, top_k: int = 5):
+    def __init__(self, embedder: OpenAIEmbedder):
         self.embedder = embedder
-        self.top_k = top_k
+        self.top_k = 5  # Default value
     
     def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         query_text: str = input_data["query_text"]
+        top_k: int = input_data.get("top_k", self.top_k)  # Use input value or default
         
         console.log("🔎 Searching for similar passages")
         similar_docs = self.embedder.find_similar(
             query_text, 
-            top_k=self.top_k
+            top_k=top_k
         )
         
         return {"similar_documents": similar_docs} 

@@ -36,7 +36,7 @@ class OpenAIEmbedder:
         for doc in documents:
             if doc.embedding is not None:
                 embedded_docs.append(doc)
-                console.log("[green]Using cached embedding[/green]")
+                # console.log("[green]Using cached embedding[/green]")
             else:
                 docs_to_embed.append(doc)
         
@@ -52,10 +52,17 @@ class OpenAIEmbedder:
     def find_similar(self, query: str, top_k: int = 5) -> List[Document]:
         """Find similar documents for a query"""
         query_result = self.text_embedder.run(text=query)
-        return self.document_store._query_by_embedding(
+        similar_docs = self.document_store._query_by_embedding(
             query_embedding=query_result["embedding"],
             top_k=top_k,
             return_embedding=True,
             filters=None,
             scale_score=True
         )
+        
+        # Ensure each document has a unique ID
+        for i, doc in enumerate(similar_docs):
+            if not hasattr(doc, 'id'):
+                doc.id = f"{doc.meta.get('chapter', 'unknown')}_{i}"
+        
+        return similar_docs
