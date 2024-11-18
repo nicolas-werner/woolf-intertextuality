@@ -2,20 +2,22 @@ from typing import List, Literal
 from pydantic import BaseModel, Field
 
 ConfidenceLevel = Literal["low", "medium", "high"]
+TransformationType = Literal["thematic", "structural", "linguistic", "cultural"]
+IntersectionType = Literal["direct", "allusive", "structural", "thematic"]
 
 class TextualIntersection(BaseModel):
     """Represents how texts intersect and transform each other"""
     surface_elements: List[str] = Field(
         description="Textual elements where the texts intersect (words, themes, structures, motifs)"
     )
-    transformation: str = Field(
+    transformation: TransformationType = Field(
         description="How Mrs. Dalloway absorbs and transforms elements from The Odyssey"
     )
-    dialogic_aspects: str = Field(
+    dialogic_aspects: IntersectionType = Field(
         description="How the texts engage in dialogue with each other and create new meanings"
     )
-    differential_meaning: str = Field(
-        description="How meanings transform across historical and cultural contexts"
+    meaning_transformation: str = Field(
+        description="How the meaning of elements changes when moved from The Odyssey to Mrs. Dalloway's modern context"
     )
 
 class AnalysisThoughtProcess(BaseModel):
