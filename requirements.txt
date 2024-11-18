@@ -1,11 +1,18 @@
-farm-haystack>=1.0.0
-qdrant-haystack
-openai>=1.0.0
-rich
-python-dotenv
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
-pandas>=2.0.0
+qdrant-client
+sentence-transformers
+openai
+transformers
+torch
+numpy
+pandas
+matplotlib
+nltk
+pydantic-settings>=2.6.1
+pydantic>=2.9.2
+qdrant-haystack>=7.0.0
+haystack-ai>=2.7.0
+rich>=13.9.4
+jinja2>=3.0.0
 
 
 
