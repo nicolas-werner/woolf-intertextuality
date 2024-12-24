@@ -27,6 +27,8 @@ def prepare_annotation_csv(results_file: Path) -> Path:
             'dalloway_text': row['dalloway_text'],
             'odyssey_text': row['odyssey_text'],
             'initial_observation': row['initial_observation'],
+            'analytical_steps': row['analytical_steps'],
+            'counter_arguments': row['counter_arguments'],
             'textual_intersections': row['textual_intersections'],
             'synthesis': row['synthesis'],
             'supporting_evidence': row['supporting_evidence'],

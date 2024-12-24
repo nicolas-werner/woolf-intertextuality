@@ -130,8 +130,23 @@ def main():
                     'odyssey_text': doc.content,
                     'odyssey_chapter': doc.meta['chapter'],
                     'similarity_score': doc.score,
+                    'similarity_type': doc.meta.get('similarity_type', 'similar'),  # Add similarity type
+                    'prompt_type': settings.llm.prompt_template,  # Add prompt type
+                    
                     # Thought Process
                     'initial_observation': analysis.thought_process.initial_observation,
+                    'analytical_steps': [
+                        {
+                            'step_description': step.step_description,
+                            'evidence': step.evidence
+                        } for step in analysis.thought_process.analytical_steps
+                    ],
+                    'counter_arguments': ';'.join(analysis.thought_process.counter_arguments),
+                    'synthesis': analysis.thought_process.synthesis,
+                    
+                    # Structured Analysis
+                    'is_meaningful': analysis.structured_analysis.is_meaningful,
+                    'confidence': analysis.structured_analysis.confidence,
                     'textual_intersections': [
                         {
                             'surface_elements': ';'.join(intersection.surface_elements),
@@ -139,14 +154,10 @@ def main():
                             'dialogic_aspects': intersection.dialogic_aspects,
                             'meaning_transformation': intersection.meaning_transformation
                         }
-                        for intersection in analysis.thought_process.textual_intersections
+                        for intersection in analysis.structured_analysis.intersections
                     ],
-                    'counter_arguments': ';'.join(analysis.thought_process.counter_arguments),
-                    'synthesis': analysis.thought_process.synthesis,
-                    # Reference
-                    'is_meaningful': analysis.reference.is_meaningful,
-                    'confidence': analysis.reference.confidence,
-                    'supporting_evidence': ';'.join(analysis.reference.supporting_evidence)
+                    'supporting_evidence': ';'.join(analysis.structured_analysis.supporting_evidence),
+                    'critique': analysis.critique
                 }
                 results.append(result)
             
@@ -173,20 +184,33 @@ def main():
     
     # Reorder columns
     column_order = [
+        # Core text chunks
         'dalloway_text', 
         'odyssey_text',
         'odyssey_chapter',
         'similarity_score',
+        'similarity_type',  # Added to distinguish similar/dissimilar pairs
+        'prompt_type',      # Added to track naive/expert prompt
+        
+        # Analysis results
         'is_meaningful',
         'confidence',
+        
+        # Thought process
         'initial_observation',
+        'analytical_steps',  # Added from AnalysisThoughtProcess
+        'counter_arguments',
+        'synthesis',
+        
+        # Textual intersections
         'surface_elements',
         'transformation',
         'dialogic_aspects',
         'meaning_transformation',
-        'counter_arguments',
-        'synthesis',
-        'supporting_evidence'
+        
+        # Evidence and critique
+        'supporting_evidence',
+        'critique'          # Added optional critique field
     ]
     
     # Reorder columns and handle any missing columns
