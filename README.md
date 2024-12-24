@@ -163,3 +163,25 @@ Key settings can be configured in `src/config/settings.py` or via environment va
 - Preprocessing parameters (chunk size, overlap)
 - File paths and storage locations
 
+### Evaluation Output
+
+The system generates two types of output files:
+
+1. **Analysis Results** (`data/results/`):
+   - Raw analysis output from both Naive and Expert prompts
+   - Includes similarity scores, textual comparisons, and detailed analyses
+   - Format: `intertextual_analysis_{prompt_type}_{model}_{timestamp}.csv`
+
+2. **Annotation Files** (`data/evaluation/`):
+   - Anonymized outputs for blind classification
+   - Answer key mapping analysis IDs to prompt types
+   - Format: 
+     - `annotation_ready_{analysis_file}.csv`
+     - `answer_key_{analysis_file}.csv`
+
+The annotation CSV facilitates:
+- Blind classification of outputs as Naive/Expert
+- Documentation of thematic and surface-level observations
+- Collection of annotator justifications
+- Tracking of inter-annotator agreement
+
