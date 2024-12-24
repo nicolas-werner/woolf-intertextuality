@@ -3,6 +3,7 @@ import json
 from typing import List, Tuple
 from haystack import Document
 from rich.console import Console
+import random
 
 from src.data_preparation.preprocessing import TextPreprocessor
 from src.data_preparation.preprocessed_data_store import PreprocessedDataStore
@@ -35,23 +36,29 @@ class DataManager:
         # Load existing chunks with embeddings
         return self.data_store.load_chunks(output_path)
 
-    def prepare_dalloway_queries(self) -> List[Document]:
-        """Process Mrs Dalloway text into query chunks"""
+    def prepare_dalloway_queries(self, sample_size: int = 20) -> List[Document]:
+        """Process Mrs Dalloway text into query chunks and randomly sample
+        
+        Args:
+            sample_size: Number of chunks to randomly sample (default: 20)
+        """
         output_path = settings.texts["dalloway"].query_path
         
-        # Always process if file doesn't exist
+        # Load or process chunks
         if not Path(output_path).exists():
             console.log("Processing Mrs Dalloway for queries...")
             queries = self.preprocessor.get_dalloway_queries(
                 settings.texts["dalloway"].raw_path
             )
-            # Generate embeddings before saving
             queries = self.embedder.embed_documents(queries)
             self.data_store.save_chunks(queries, output_path)
-            return queries
+        else:
+            queries = self.data_store.load_chunks(output_path)
         
-        # Load existing chunks with embeddings
-        return self.data_store.load_chunks(output_path)
+        # Randomly sample chunks
+        if sample_size and sample_size < len(queries):
+            return random.sample(queries, sample_size)
+        return queries
 
     def load_data(self) -> Tuple[List[Document], List[Document]]:
         """Load or create query chunks and Odyssey documents"""

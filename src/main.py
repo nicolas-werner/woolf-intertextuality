@@ -10,6 +10,9 @@ from datetime import datetime
 from src.pipeline.pipeline_facade import PipelineFacade
 from src.data_preparation.data_manager import DataManager
 from src.config.settings import settings
+from typing import List
+from sklearn.metrics.pairwise import cosine_similarity
+from src.evaluation.prepare_annotation_data import prepare_annotation_csv
 
 console = Console()
 
@@ -46,6 +49,22 @@ def display_settings_table():
     table.add_row("Chunk Overlap", str(settings.preprocessing.chunk_overlap))
     
     console.print(table)
+
+def get_dissimilar_chunks(query_embedding: List[float], docs: List[Document], k: int = 2) -> List[Document]:
+    """Find the k most dissimilar chunks based on cosine similarity
+    
+    Args:
+        query_embedding: Embedding vector of query text
+        docs: List of documents to search
+        k: Number of dissimilar chunks to return
+    """
+    # Calculate similarities
+    for doc in docs:
+        doc.score = 1 - cosine_similarity(query_embedding, doc.embedding)
+    
+    # Sort by dissimilarity (highest score = most dissimilar)
+    sorted_docs = sorted(docs, key=lambda x: x.score, reverse=True)
+    return sorted_docs[:k]
 
 def main():
     args = parse_args()
@@ -179,6 +198,10 @@ def main():
     
     df.to_csv(output_path, index=False, encoding='utf-8')
     console.print(f"\n[bold green]✅ Analysis results saved to {output_path}[/bold green]")
+    
+    # Prepare annotation version
+    annotation_path = prepare_annotation_csv(output_path)
+    console.log(f"[green]✓[/green] Prepared annotation file: {annotation_path}")
 
 if __name__ == "__main__":
     main()
