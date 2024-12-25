@@ -6,7 +6,7 @@ from .schemas import (
     TextualIntersection,
     TransformationType,
     IntersectionType,
-    AnalysisStep
+    AnalysisStep,
 )
 
 __all__ = [
@@ -17,5 +17,5 @@ __all__ = [
     "TextualIntersection",
     "TransformationType",
     "IntersectionType",
-    "AnalysisStep"
-] 
+    "AnalysisStep",
+]

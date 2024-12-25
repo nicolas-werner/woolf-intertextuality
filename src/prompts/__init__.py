@@ -1,5 +1,3 @@
 from .generator import PromptGenerator
 
-__all__ = [
-    "PromptGenerator"
-] 
+__all__ = ["PromptGenerator"]

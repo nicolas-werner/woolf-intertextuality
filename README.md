@@ -183,3 +183,93 @@ The annotation CSV facilitates:
 - Collection of annotator justifications
 - Tracking of inter-annotator agreement
 
+## Development
+
+### Testing
+
+Tests are written using pytest and can be run with:
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run with coverage report
+uv run pytest --cov=src tests/
+
+# Run specific test file
+uv run pytest tests/test_pipeline_steps.py
+
+# Run specific test
+uv run pytest tests/test_pipeline_steps.py::test_analysis_step
+```
+
+The test suite includes:
+- Unit tests for all pipeline components
+- Integration tests for the full analysis pipeline
+- Mock OpenAI responses to avoid API calls during testing
+
+### Code Quality
+
+This project uses Ruff for linting and formatting. Ruff combines the functionality of multiple Python linters (like flake8, black, isort) into a single fast tool.
+
+#### Installing Ruff
+
+```bash
+# Install Ruff as a development tool
+uv tool install ruff
+
+# Or upgrade to latest version
+uv tool upgrade ruff
+```
+
+```bash
+# Run linter
+uv run ruff check .
+
+# Auto-fix linting issues
+uv run ruff check --fix .
+
+# Format code
+uv run ruff format .
+```
+
+Ruff is configured in `pyproject.toml` with the following settings:
+- Line length: 88 characters (same as Black)
+- Python target version: 3.9+
+- Enabled rules:
+  - E4, E7, E9: Essential error checks
+  - F: PyFlakes error detection
+
+### Continuous Integration
+
+GitHub Actions automatically run tests and linting on all pull requests and pushes to main. The workflow:
+1. Runs the full test suite
+2. Generates a coverage report
+3. Checks code formatting with Ruff
+4. Ensures all tests pass before merging
+
+To run all checks locally before committing:
+```bash
+# Sync project dependencies including dev dependencies
+uv sync --all-extras --dev
+
+# Run all checks
+uv run pytest && uv run ruff check . && uv run ruff format --check .
+```
+
+### Project Structure
+
+The project follows standard Python project structure:
+```
+.
+├── .venv                  # Virtual environment (created by uv)
+├── .python-version        # Python version specification
+├── pyproject.toml         # Project metadata and dependencies
+├── uv.lock               # Lockfile for reproducible installations
+├── src/                  # Source code
+├── tests/                # Test files
+└── data/                 # Data files
+```
+
+For more details on project structure and management with uv, see the [uv documentation](https://docs.astral.sh/uv/).
+

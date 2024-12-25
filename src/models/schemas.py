@@ -5,8 +5,10 @@ ConfidenceLevel = Literal["low", "medium", "high"]
 TransformationType = Literal["thematic", "structural", "linguistic", "cultural"]
 IntersectionType = Literal["direct", "allusive", "structural", "thematic"]
 
+
 class TextualIntersection(BaseModel):
     """Represents how texts intersect and transform each other."""
+
     surface_elements: List[str] = Field(
         description="Specific textual elements where the texts intersect (e.g., words, themes, structures, motifs)."
     )
@@ -20,18 +22,22 @@ class TextualIntersection(BaseModel):
         description="Explanation of how meaning evolves when elements are moved from The Odyssey to Mrs. Dalloway's context."
     )
 
+
 class AnalysisStep(BaseModel):
     """Represents a step in the thought process of intertextual analysis."""
+
     step_description: str = Field(
         description="Description of the analysis performed at this step."
     )
     evidence: Optional[str] = Field(
         default=None,
-        description="Optional supporting evidence or reasoning for this step."
+        description="Optional supporting evidence or reasoning for this step.",
     )
+
 
 class AnalysisThoughtProcess(BaseModel):
     """Represents the thought process for analyzing intertextual relationships."""
+
     initial_observation: str = Field(
         description="Initial observations about textual similarities and resonances."
     )
@@ -45,8 +51,10 @@ class AnalysisThoughtProcess(BaseModel):
         description="Final conclusion on whether and how Mrs. Dalloway engages intertextually with The Odyssey."
     )
 
+
 class IntertextualConnections(BaseModel):
     """Detailed analysis of intertextual relationships between text passages."""
+
     is_meaningful: bool = Field(
         description="Whether the textual relationship constitutes a meaningful intertextual connection."
     )
@@ -60,8 +68,10 @@ class IntertextualConnections(BaseModel):
         description="Direct textual evidence supporting the intertextual connection."
     )
 
+
 class IntertextualAnalysis(BaseModel):
     """Complete analysis of intertextual relationships between text passages."""
+
     thought_process: AnalysisThoughtProcess = Field(
         description="Detailed reasoning behind the intertextual analysis."
     )
@@ -70,5 +80,5 @@ class IntertextualAnalysis(BaseModel):
     )
     critique: Optional[str] = Field(
         default=None,
-        description="Optional critical evaluation of the analysis process or results."
+        description="Optional critical evaluation of the analysis process or results.",
     )
