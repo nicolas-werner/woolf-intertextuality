@@ -113,10 +113,10 @@ def main():
                     "odyssey_text": doc.content,
                     "odyssey_chapter": doc.meta["chapter"],
                     "similarity_score": doc.score,
-                    "similarity_type": doc.meta[
-                        "similarity_type"
-                    ], 
+                    "similarity_type": doc.meta["similarity_type"],
                     "prompt_type": settings.llm.prompt_template,
+                    
+                    # Thought Process
                     "initial_observation": analysis.thought_process.initial_observation,
                     "analytical_steps": [
                         {
@@ -125,11 +125,13 @@ def main():
                         }
                         for step in analysis.thought_process.analytical_steps
                     ],
-                    "counter_arguments": ";".join(
-                        analysis.thought_process.counter_arguments
-                    ),
+                    "counter_arguments": ";".join(analysis.thought_process.counter_arguments),
                     "synthesis": analysis.thought_process.synthesis,
+                    "theoretical_grounding": ";".join(
+                        f"{k}: {v}" for k, v in analysis.thought_process.theoretical_grounding.items()
+                    ),
                     
+                    # Structured Analysis
                     "is_meaningful": analysis.structured_analysis.is_meaningful,
                     "confidence": analysis.structured_analysis.confidence,
                     "textual_intersections": [
@@ -138,13 +140,17 @@ def main():
                             "transformation": intersection.transformation,
                             "dialogic_aspects": intersection.dialogic_aspects,
                             "meaning_transformation": intersection.meaning_transformation,
+                            "feminist_reimagining": intersection.feminist_reimagining,
+                            "integration_technique": intersection.integration_technique,
                         }
                         for intersection in analysis.structured_analysis.intersections
                     ],
-                    "supporting_evidence": ";".join(
-                        analysis.structured_analysis.supporting_evidence
+                    "multilayer_analysis": ";".join(
+                        f"{k}: {v}" for k, v in analysis.structured_analysis.multilayer_analysis.items()
                     ),
-                    "critique": analysis.critique,
+                    "homeric_elements": ";".join(
+                        analysis.structured_analysis.homeric_elements
+                    ),
                 }
                 results.append(result)
 

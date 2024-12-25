@@ -9,7 +9,7 @@ console = Console()
 class SimilaritySearchStep(PipelineStep):
     """Step for finding similar passages"""
 
-    def __init__(self, embedder: OpenAIEmbedder, top_k: int = 2):
+    def __init__(self, embedder: OpenAIEmbedder, top_k: int = 1):
         """Initialize with embedder and document store
 
         Args:

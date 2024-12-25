@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Dict
 from pydantic import BaseModel, Field
 
 ConfidenceLevel = Literal["low", "medium", "high"]
@@ -16,10 +16,18 @@ class TextualIntersection(BaseModel):
         description="Type of transformation from The Odyssey to Mrs. Dalloway."
     )
     dialogic_aspects: IntersectionType = Field(
-        description="Nature of the dialogic relationship between the texts (e.g., direct, thematic)."
+        description="Nature of the dialogic relationship between the texts."
     )
     meaning_transformation: str = Field(
-        description="Explanation of how meaning evolves when elements are moved from The Odyssey to Mrs. Dalloway's context."
+        description="Explanation of how meaning evolves in Mrs. Dalloway's context."
+    )
+    feminist_reimagining: Optional[str] = Field(
+        description="How Woolf reinterprets male-centric narratives from a feminist perspective.",
+        default=None
+    )
+    integration_technique: Optional[str] = Field(
+        description="How Woolf subtly integrates the reference (e.g., hermetic, structural, thematic).",
+        default=None
     )
 
 
@@ -42,13 +50,17 @@ class AnalysisThoughtProcess(BaseModel):
         description="Initial observations about textual similarities and resonances."
     )
     analytical_steps: List[AnalysisStep] = Field(
-        description="Step-by-step reasoning process for intertextual analysis."
+        description="Step-by-step reasoning process."
     )
     counter_arguments: List[str] = Field(
-        description="Potential counterarguments or alternative interpretations of the relationship."
+        description="Potential counterarguments or alternative interpretations."
     )
     synthesis: str = Field(
-        description="Final conclusion on whether and how Mrs. Dalloway engages intertextually with The Odyssey."
+        description="Final conclusion on intertextual engagement."
+    )
+    theoretical_grounding: Optional[Dict[str, str]] = Field(
+        description="How the analysis applies Kristeva, Genette, and Schubert's theories.",
+        default_factory=dict
     )
 
 
@@ -59,13 +71,21 @@ class IntertextualConnections(BaseModel):
         description="Whether the textual relationship constitutes a meaningful intertextual connection."
     )
     confidence: ConfidenceLevel = Field(
-        description="Confidence level in the intertextual identification based on analysis and evidence."
+        description="Confidence level in the intertextual identification."
     )
     intersections: List[TextualIntersection] = Field(
         description="Specific points where the texts intersect and transform each other."
     )
     supporting_evidence: List[str] = Field(
-        description="Direct textual evidence supporting the intertextual connection."
+        description="Direct textual evidence supporting the connection."
+    )
+    multilayer_analysis: Optional[Dict[str, str]] = Field(
+        description="Analysis across linguistic, structural, thematic, and generic levels.",
+        default_factory=dict
+    )
+    homeric_elements: Optional[List[str]] = Field(
+        description="Specific Homeric motifs, themes, or structures identified.",
+        default_factory=list
     )
 
 
@@ -80,5 +100,5 @@ class IntertextualAnalysis(BaseModel):
     )
     critique: Optional[str] = Field(
         default=None,
-        description="Optional critical evaluation of the analysis process or results.",
+        description="critical evaluation of the analysis process or results whether it is a meaningful intertextual connection or not",
     )

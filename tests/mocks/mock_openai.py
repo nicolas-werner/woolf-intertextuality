@@ -31,6 +31,11 @@ class MockOpenAI:
                 ],
                 "counter_arguments": ["Mock counter argument"],
                 "synthesis": "Mock synthesis of the analysis",
+                "theoretical_grounding": {
+                    "kristeva": "Mock Kristeva application",
+                    "genette": "Mock Genette analysis",
+                    "schubert": "Mock Schubert approach"
+                }
             },
             "structured_analysis": {
                 "is_meaningful": True,
@@ -41,11 +46,19 @@ class MockOpenAI:
                         "transformation": "thematic",
                         "dialogic_aspects": "direct",
                         "meaning_transformation": "Mock meaning transformation description",
+                        "feminist_reimagining": "Mock feminist reinterpretation",
+                        "integration_technique": "hermetic"
                     }
                 ],
                 "supporting_evidence": ["Mock evidence for the analysis"],
+                "multilayer_analysis": {
+                    "linguistic": "Mock linguistic analysis",
+                    "structural": "Mock structural analysis",
+                    "thematic": "Mock thematic analysis"
+                },
+                "homeric_elements": ["Mock Homeric motif"]
             },
-            "critique": "Mock critique of the analysis",
+            "critique": "Mock critique of the analysis"
         }
 
         # Ensure clean JSON serialization
