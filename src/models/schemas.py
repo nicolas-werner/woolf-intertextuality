@@ -3,29 +3,34 @@ from pydantic import BaseModel, Field
 
 ConfidenceLevel = Literal["low", "medium", "high"]
 TransformationType = Literal["thematic", "structural", "linguistic", "cultural"]
-IntersectionType = Literal["direct", "allusive", "structural", "thematic"]
+IntersectionType = Literal[
+    "intertextual",  # Direct quotations, allusions (Genette)
+    "hypertextual",  # Transformative reworkings (Genette)
+    "dialogic",      # Dynamic interplay (Kristeva)
+    "pragmatic"      # Effective presence (Schubert)
+]
 
 
 class TextualIntersection(BaseModel):
     """Represents how texts intersect and transform each other."""
 
     surface_elements: List[str] = Field(
-        description="Specific textual elements where the texts intersect (e.g., words, themes, structures, motifs)."
+        description="Specific textual elements (e.g., words, themes, motifs) that create intertextual networks."
     )
     transformation: TransformationType = Field(
-        description="Type of transformation from The Odyssey to Mrs. Dalloway."
+        description="How Odyssey elements are transformed in Mrs. Dalloway's modernist context."
     )
     dialogic_aspects: IntersectionType = Field(
-        description="Nature of the dialogic relationship between the texts."
+        description="Type of intertextual relationship based on Kristeva, Genette, and Schubert's theories."
     )
     meaning_transformation: str = Field(
-        description="Explanation of how meaning evolves in Mrs. Dalloway's context."
+        description="Analysis of how meaning emerges through textual interactions and transformations."
     )
-    feminist_reimagining: Optional[str] = Field(
+    feminist_reimagining: str = Field(
         description="How Woolf reinterprets male-centric narratives from a feminist perspective.",
         default=None
     )
-    integration_technique: Optional[str] = Field(
+    integration_technique: str = Field(
         description="How Woolf subtly integrates the reference (e.g., hermetic, structural, thematic).",
         default=None
     )
@@ -37,9 +42,9 @@ class AnalysisStep(BaseModel):
     step_description: str = Field(
         description="Description of the analysis performed at this step."
     )
-    evidence: Optional[str] = Field(
-        default=None,
-        description="Optional supporting evidence or reasoning for this step.",
+    evidence: str = Field(
+        description="supporting evidence or reasoning for this step.",
+        default=None
     )
 
 
@@ -47,7 +52,7 @@ class AnalysisThoughtProcess(BaseModel):
     """Represents the thought process for analyzing intertextual relationships."""
 
     initial_observation: str = Field(
-        description="Initial observations about textual similarities and resonances."
+        description="Initial observations about textual networks and relationships."
     )
     analytical_steps: List[AnalysisStep] = Field(
         description="Step-by-step reasoning process."
@@ -56,7 +61,7 @@ class AnalysisThoughtProcess(BaseModel):
         description="Potential counterarguments or alternative interpretations."
     )
     synthesis: str = Field(
-        description="Final conclusion on intertextual engagement."
+        description="Synthesis of how texts create meaning through their interactions."
     )
     theoretical_grounding: Optional[Dict[str, str]] = Field(
         description="How the analysis applies Kristeva, Genette, and Schubert's theories.",
@@ -68,24 +73,16 @@ class IntertextualConnections(BaseModel):
     """Detailed analysis of intertextual relationships between text passages."""
 
     is_meaningful: bool = Field(
-        description="Whether the textual relationship constitutes a meaningful intertextual connection."
+        description="Whether the texts create meaningful networks of significance."
     )
     confidence: ConfidenceLevel = Field(
         description="Confidence level in the intertextual identification."
     )
     intersections: List[TextualIntersection] = Field(
-        description="Specific points where the texts intersect and transform each other."
+        description="Points of intersection in the dynamic network of textual relationships."
     )
     supporting_evidence: List[str] = Field(
-        description="Direct textual evidence supporting the connection."
-    )
-    multilayer_analysis: Optional[Dict[str, str]] = Field(
-        description="Analysis across linguistic, structural, thematic, and generic levels.",
-        default_factory=dict
-    )
-    homeric_elements: Optional[List[str]] = Field(
-        description="Specific Homeric motifs, themes, or structures identified.",
-        default_factory=list
+        description="Evidence of textual absorption, transformation, and dialogue."
     )
 
 

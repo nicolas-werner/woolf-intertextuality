@@ -145,12 +145,6 @@ def main():
                         }
                         for intersection in analysis.structured_analysis.intersections
                     ],
-                    "multilayer_analysis": ";".join(
-                        f"{k}: {v}" for k, v in analysis.structured_analysis.multilayer_analysis.items()
-                    ),
-                    "homeric_elements": ";".join(
-                        analysis.structured_analysis.homeric_elements
-                    ),
                 }
                 results.append(result)
 

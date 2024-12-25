@@ -51,6 +51,3 @@ def test_analysis_step(pipeline, sample_documents, mock_openai, monkeypatch):
     intersection = analysis.structured_analysis.intersections[0]
     assert intersection.feminist_reimagining is not None
     assert intersection.integration_technique is not None
-    
-    assert analysis.structured_analysis.multilayer_analysis
-    assert analysis.structured_analysis.homeric_elements

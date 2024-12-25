@@ -44,19 +44,13 @@ class MockOpenAI:
                     {
                         "surface_elements": ["Mock element"],
                         "transformation": "thematic",
-                        "dialogic_aspects": "direct",
+                        "dialogic_aspects": "intertextual",
                         "meaning_transformation": "Mock meaning transformation description",
                         "feminist_reimagining": "Mock feminist reinterpretation",
                         "integration_technique": "hermetic"
                     }
                 ],
                 "supporting_evidence": ["Mock evidence for the analysis"],
-                "multilayer_analysis": {
-                    "linguistic": "Mock linguistic analysis",
-                    "structural": "Mock structural analysis",
-                    "thematic": "Mock thematic analysis"
-                },
-                "homeric_elements": ["Mock Homeric motif"]
             },
             "critique": "Mock critique of the analysis"
         }
