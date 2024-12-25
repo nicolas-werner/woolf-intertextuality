@@ -24,10 +24,8 @@ class SimilaritySearchStep(PipelineStep):
         """Find both similar and dissimilar passages"""
         query_text: str = input_data["query_text"]
 
-        # Get embeddings for query
         query_embedding = self.embedder.embed_query(query_text)
 
-        # Find most similar passages
         similar_docs = self.document_store._query_by_embedding(
             query_embedding=query_embedding,
             filters={},
@@ -36,29 +34,27 @@ class SimilaritySearchStep(PipelineStep):
             scale_score=True,
         )
 
-        # Find most dissimilar passages by getting more results and taking the least similar
         all_docs = self.document_store._query_by_embedding(
             query_embedding=query_embedding,
             filters={},
-            top_k=self.top_k * 10,  # Get more docs to find dissimilar ones
+            top_k=None,  
             return_embedding=True,
             scale_score=True,
         )
 
-        # Sort by score ascending and take the most dissimilar ones
         dissimilar_docs = sorted(all_docs, key=lambda x: x.score)[: self.top_k]
 
-        # Mark similarity type and ensure all metadata is present
         for doc in similar_docs:
             if not hasattr(doc, "meta"):
                 doc.meta = {}
             doc.meta["similarity_type"] = "similar"
+            console.log(f"[cyan]Similar passage (score: {doc.score:.3f}): {doc.content[:100]}...[/cyan]")
 
         for doc in dissimilar_docs:
             if not hasattr(doc, "meta"):
                 doc.meta = {}
             doc.meta["similarity_type"] = "dissimilar"
+            console.log(f"[yellow]Dissimilar passage (score: {doc.score:.3f}): {doc.content[:100]}...[/yellow]")
 
-        # Combine results
         input_data["similar_documents"] = similar_docs + dissimilar_docs
         return input_data

@@ -55,30 +55,23 @@ def display_settings_table():
 def main():
     args = parse_args()
 
-    # Display settings table
     display_settings_table()
 
-    # Initialize components
     data_manager = DataManager()
     token_counter = TokenCounter()
     pipeline = PipelineFacade(token_counter=token_counter)
 
-    # Load data
     console.log("📚 Loading and preparing documents")
     query_chunks, odyssey_docs = data_manager.load_data()
 
-    # Apply limit if specified
     if args.limit:
         console.log(f"[yellow]Limiting analysis to first {args.limit} queries[/yellow]")
         query_chunks = query_chunks[: args.limit]
 
-    # Index Odyssey documents
     pipeline.index_documents(odyssey_docs)
 
-    # Prepare list to store results
     results = []
 
-    # Process each chunk from Mrs Dalloway with progress bar
     total_queries = len(query_chunks)
 
     with Progress(
@@ -88,12 +81,10 @@ def main():
         console=console,
         transient=False,
     ) as progress:
-        # Add task for overall Dalloway chunks
         dalloway_task = progress.add_task(
             "[cyan]Processing Mrs Dalloway chunks...", total=total_queries
         )
 
-        # Add task for passage analysis (2 similar + 2 dissimilar per chunk)
         analysis_task = progress.add_task(
             "[cyan]Analyzing passages...",
             total=total_queries * 4,  # 2 similar + 2 dissimilar passages per chunk
@@ -102,27 +93,21 @@ def main():
         for i, query_doc in enumerate(query_chunks, 1):
             query_text = query_doc.content
 
-            # Update Dalloway progress description
             progress.update(
                 dalloway_task,
                 description=f"[cyan]Processing Dalloway chunk {i}/{total_queries}",
             )
 
-            # Find similar and dissimilar passages
             all_docs = pipeline.find_similar_passages(query_text)
 
-            # Analyze each passage pair
             for j, doc in enumerate(all_docs, 1):
-                # Update analysis progress description
                 progress.update(
                     analysis_task,
                     description=f"[cyan]Analyzing {doc.meta['similarity_type']} passage {j}/{len(all_docs)} for chunk {i}/{total_queries}",
                 )
 
-                # Perform intertextual analysis
                 analysis = pipeline.analyze_similarity(query_text, doc)
 
-                # Store results
                 result = {
                     "dalloway_text": query_text,
                     "odyssey_text": doc.content,
@@ -130,9 +115,8 @@ def main():
                     "similarity_score": doc.score,
                     "similarity_type": doc.meta[
                         "similarity_type"
-                    ],  # This will now be 'similar' or 'dissimilar'
+                    ], 
                     "prompt_type": settings.llm.prompt_template,
-                    # Thought Process
                     "initial_observation": analysis.thought_process.initial_observation,
                     "analytical_steps": [
                         {
@@ -145,7 +129,7 @@ def main():
                         analysis.thought_process.counter_arguments
                     ),
                     "synthesis": analysis.thought_process.synthesis,
-                    # Structured Analysis
+                    
                     "is_meaningful": analysis.structured_analysis.is_meaningful,
                     "confidence": analysis.structured_analysis.confidence,
                     "textual_intersections": [
@@ -164,13 +148,10 @@ def main():
                 }
                 results.append(result)
 
-                # Update analysis progress for each passage analyzed
                 progress.update(analysis_task, advance=1)
 
-            # Update Dalloway progress
             progress.update(dalloway_task, advance=1)
 
-    # Save results to CSV with timestamp
     output_dir = Path("data/results")
     output_dir.mkdir(parents=True, exist_ok=True)
     output_filename = get_timestamped_filename(
@@ -178,37 +159,32 @@ def main():
     )
     output_path = output_dir / output_filename
 
-    # Convert results directly to DataFrame
     df = pd.DataFrame(results)
 
-    # Extract the first textual intersection for each row
     df["textual_intersection"] = df["textual_intersections"].apply(
         lambda x: x[0] if x else None
     )
 
-    # Convert the dictionary in textual_intersection to separate columns
     intersection_df = pd.DataFrame(df["textual_intersection"].tolist())
 
-    # Drop the original columns and combine with the intersection details
     df = df.drop(["textual_intersections", "textual_intersection"], axis=1).join(
         intersection_df
     )
 
-    # Reorder columns
     column_order = [
         # Core text chunks
         "dalloway_text",
         "odyssey_text",
         "odyssey_chapter",
         "similarity_score",
-        "similarity_type",  # Added to distinguish similar/dissimilar pairs
-        "prompt_type",  # Added to track naive/expert prompt
+        "similarity_type",  
+        "prompt_type",  
         # Analysis results
         "is_meaningful",
         "confidence",
         # Thought process
         "initial_observation",
-        "analytical_steps",  # Added from AnalysisThoughtProcess
+        "analytical_steps",  
         "counter_arguments",
         "synthesis",
         # Textual intersections
@@ -218,10 +194,9 @@ def main():
         "meaning_transformation",
         # Evidence and critique
         "supporting_evidence",
-        "critique",  # Added optional critique field
+        "critique",  
     ]
 
-    # Reorder columns and handle any missing columns
     existing_columns = [col for col in column_order if col in df.columns]
     remaining_columns = [col for col in df.columns if col not in column_order]
     final_column_order = existing_columns + remaining_columns
@@ -233,11 +208,9 @@ def main():
         f"\n[bold green]✅ Analysis results saved to {output_path}[/bold green]"
     )
 
-    # Prepare annotation version
     annotation_path = prepare_annotation_csv(output_path)
     console.log(f"[green]✓[/green] Prepared annotation file: {annotation_path}")
 
-    # Print token usage report before exiting
     token_counter.print_usage_report()
 
 

@@ -19,9 +19,7 @@ class DocumentIndexingStep(PipelineStep):
         documents: List[Document] = input_data["documents"]
 
         console.log("📚 Indexing documents")
-        # First embed documents
         embedded_docs = self.embedder.embed_documents(documents)
-        # Add to vector store
         self.vector_store.add_documents(embedded_docs)
         console.log("[bold green]✅ Indexing complete![/bold green]")
 

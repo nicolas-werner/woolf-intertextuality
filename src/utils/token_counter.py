@@ -93,13 +93,3 @@ class TokenCounter:
 
         total_cost = self.usage["embedding"]["cost"] + self.usage["completion"]["cost"]
         console.print(f"\n[green]Total Cost: ${total_cost:.4f}[/green]")
-
-        batch_cost = (
-            (
-                self.usage["completion"]["input_tokens"]
-                + self.usage["completion"]["cached_input_tokens"]
-            )
-            / 1000
-            * 0.00125
-        ) + (self.usage["completion"]["output_tokens"] / 1000 * 0.005)
-        console.print(f"\n[yellow]Projected Batch API Cost: ${batch_cost:.4f}[/yellow]")

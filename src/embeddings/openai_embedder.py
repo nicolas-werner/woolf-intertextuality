@@ -18,10 +18,8 @@ class OpenAIEmbedder:
         """
         self.document_store = document_store
 
-        # Common configuration for embedders
         embedder_config = {"model": settings.embeddings.api_model}
 
-        # Initialize embedders
         self.document_embedder = OpenAIDocumentEmbedder(**embedder_config)
         self.text_embedder = OpenAITextEmbedder(**embedder_config)
 

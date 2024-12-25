@@ -19,7 +19,6 @@ class PipelineOrchestrator:
     """Orchestrates the intertextuality analysis pipeline"""
 
     def __init__(self, token_counter: TokenCounter):
-        # Initialize components
         self.vector_store = QdrantManager(embedding_dim=settings.embeddings.dimension)
 
         self.embedder = OpenAIEmbedder(document_store=self.vector_store.document_store)
@@ -31,7 +30,6 @@ class PipelineOrchestrator:
 
         self.client = OpenAI(api_key=settings.openai_api_key)
 
-        # Initialize all possible pipeline steps
         self.indexing_step = DocumentIndexingStep(
             embedder=self.embedder, vector_store=self.vector_store
         )
@@ -48,20 +46,16 @@ class PipelineOrchestrator:
         current_data = initial_data.copy()
 
         try:
-            # Determine which steps to run based on input data
             if "documents" in current_data:
-                # Document indexing flow
                 current_data = self.indexing_step.execute(current_data)
 
             elif "query_text" in current_data and "document" in current_data:
-                # Analysis flow - both query_text and document are needed
                 console.log("[cyan]Executing analysis step...[/cyan]")
                 result = self.analysis_step.execute(current_data)
                 console.log(f"[cyan]Analysis step result: {result}[/cyan]")
                 current_data.update(result)
 
             elif "query_text" in current_data:
-                # Similarity search flow - only query_text is present
                 current_data = self.search_step.execute(current_data)
 
             else:

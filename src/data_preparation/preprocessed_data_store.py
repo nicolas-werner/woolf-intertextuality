@@ -22,13 +22,11 @@ class PreprocessedDataStore:
         total_with_embeddings = 0
         with open(output_path, "w", encoding="utf-8", errors="replace") as f:
             for doc in documents:
-                # Handle both Document objects and dictionaries
                 if isinstance(doc, Document):
                     doc_dict = {
                         "content": doc.content,
                         "meta": doc.meta,
                     }
-                    # Check for embedding
                     if hasattr(doc, "embedding") and doc.embedding is not None:
                         if isinstance(doc.embedding, np.ndarray):
                             doc_dict["embedding"] = doc.embedding.tolist()
@@ -65,7 +63,6 @@ class PreprocessedDataStore:
                     content = chunk.get("content", chunk.get("text", ""))
                     meta = chunk.get("meta", {})
 
-                    # Convert embedding back to numpy array if it exists
                     embedding = None
                     if "embedding" in chunk:
                         embedding = np.array(chunk["embedding"])

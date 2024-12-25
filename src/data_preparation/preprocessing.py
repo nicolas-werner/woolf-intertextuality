@@ -17,7 +17,6 @@ class TextPreprocessor:
     """Handles text preprocessing and chunking for both texts"""
 
     def __init__(self):
-        # Initialize text cleaner for initial raw text cleaning
         self.text_cleaner = TextCleaner(
             remove_regexps=[r"\[\d+\].*?(?=\n\n|\Z)"],  # Remove footnotes
             convert_to_lowercase=False,
@@ -25,7 +24,6 @@ class TextPreprocessor:
             remove_numbers=False,
         )
 
-        # Initialize document cleaner for structural cleaning
         self.cleaner = DocumentCleaner(
             remove_empty_lines=True,
             remove_extra_whitespaces=True,
@@ -53,17 +51,13 @@ class TextPreprocessor:
         with open(input_file, "r", encoding="utf-8", errors="replace") as f:
             text = f.read()
 
-        # Initial cleaning
         text = self._clean_text(text)
 
-        # Create initial document
         doc = Document(content=text)
 
-        # Clean and split the document
         cleaned_docs = self.cleaner.run(documents=[doc])["documents"]
         split_docs = self.splitter.run(documents=cleaned_docs)["documents"]
 
-        # Add metadata to documents
         for i, doc in enumerate(split_docs, 1):
             doc.meta = {"source": "Mrs Dalloway", "chunk_number": i}
 
@@ -83,13 +77,10 @@ class TextPreprocessor:
             book_content = books[i + 1]
             book_num = i // 2 + 1
 
-            # Initial cleaning
             book_content = self._clean_text(book_content)
 
-            # Create initial document
             doc = Document(content=book_content)
 
-            # Clean and split the document
             cleaned_docs = self.cleaner.run(documents=[doc])["documents"]
             split_docs = self.splitter.run(documents=cleaned_docs)["documents"]
 

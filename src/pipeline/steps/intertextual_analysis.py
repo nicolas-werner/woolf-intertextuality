@@ -53,17 +53,14 @@ class IntertextualAnalysisStep(PipelineStep):
                 max_tokens=settings.llm.max_tokens,
             )
 
-            # Track token usage
             self.token_counter.track_completion(
                 messages=messages, completion_tokens=completion.usage.completion_tokens
             )
 
-            # Log the raw response for debugging
             console.log(
                 f"[cyan]Raw LLM response:[/cyan] {completion.choices[0].message.content}"
             )
 
-            # Parse the response into our schema
             analysis = IntertextualAnalysis.model_validate_json(
                 completion.choices[0].message.content
             )
