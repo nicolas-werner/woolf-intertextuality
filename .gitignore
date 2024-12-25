@@ -5,3 +5,8 @@ __pycache__
 .DS_Store
 writing/*
 .cursorrules
+.venv
+.pytest_cache
+.coverage*
+.ruff_cache
+uv.lock
