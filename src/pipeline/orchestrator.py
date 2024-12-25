@@ -6,6 +6,7 @@ from src.config.settings import settings
 from src.embeddings.openai_embedder import OpenAIEmbedder
 from src.vector_store.qdrant_store import QdrantManager
 from src.prompts.generator import PromptGenerator
+from src.utils.token_counter import TokenCounter
 
 from .steps.base import PipelineStep
 from .steps.document_indexing import DocumentIndexingStep
@@ -17,7 +18,7 @@ console = Console()
 class PipelineOrchestrator:
     """Orchestrates the intertextuality analysis pipeline"""
     
-    def __init__(self):
+    def __init__(self, token_counter: TokenCounter):
         # Initialize components
         self.vector_store = QdrantManager(
             embedding_dim=settings.embeddings.dimension
@@ -45,7 +46,8 @@ class PipelineOrchestrator:
         self.analysis_step = IntertextualAnalysisStep(
             client=self.client,
             prompt_generator=self.prompt_generator,
-            system_prompt=self.system_prompt
+            system_prompt=self.system_prompt,
+            token_counter=token_counter
         )
     
     def execute(self, initial_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -58,14 +60,16 @@ class PipelineOrchestrator:
                 # Document indexing flow
                 current_data = self.indexing_step.execute(current_data)
                 
-            elif "query_text" in current_data and "top_k" in current_data:
-                # Similarity search flow
-                self.search_step.top_k = current_data["top_k"]
-                current_data = self.search_step.execute(current_data)
+            elif "query_text" in current_data and "document" in current_data:
+                # Analysis flow - both query_text and document are needed
+                console.log("[cyan]Executing analysis step...[/cyan]")
+                result = self.analysis_step.execute(current_data)
+                console.log(f"[cyan]Analysis step result: {result}[/cyan]")
+                current_data.update(result)
                 
-            elif "query_text" in current_data and "similar_document" in current_data:
-                # Analysis flow
-                current_data = self.analysis_step.execute(current_data)
+            elif "query_text" in current_data:
+                # Similarity search flow - only query_text is present
+                current_data = self.search_step.execute(current_data)
                 
             else:
                 raise ValueError("Invalid input data for pipeline execution")
@@ -74,4 +78,5 @@ class PipelineOrchestrator:
             
         except Exception as e:
             console.print(f"[red]Error in pipeline execution: {str(e)}[/red]")
+            console.print(f"[red]Current data: {current_data}[/red]")
             raise 

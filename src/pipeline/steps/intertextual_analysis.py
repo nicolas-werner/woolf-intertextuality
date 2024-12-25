@@ -6,6 +6,7 @@ from .base import PipelineStep
 from src.prompts.generator import PromptGenerator
 from src.models.schemas import IntertextualAnalysis
 from src.config.settings import settings
+from src.utils.token_counter import TokenCounter
 
 console = Console()
 
@@ -16,32 +17,60 @@ class IntertextualAnalysisStep(PipelineStep):
         self,
         client: OpenAI,
         prompt_generator: PromptGenerator,
-        system_prompt: str
+        system_prompt: str,
+        token_counter: TokenCounter
     ):
         self.client = client
         self.prompt_generator = prompt_generator
         self.system_prompt = system_prompt
+        self.token_counter = token_counter
     
     def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         query_text: str = input_data["query_text"]
-        similar_doc: Document = input_data["similar_document"]
+        doc: Document = input_data["document"]
         
         prompt = self.prompt_generator.generate(
             template_name="analysis",
             dalloway_text=query_text,
-            odyssey_text=similar_doc.content,
-            similarity_score=similar_doc.score
+            odyssey_text=doc.content,
+            similarity_score=doc.score,
+            similarity_type=doc.meta['similarity_type']
         )
         
-        completion = self.client.beta.chat.completions.parse(
-            model=settings.llm.model,
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            response_format=IntertextualAnalysis,
-            temperature=settings.llm.temperature,
-            max_tokens=settings.llm.max_tokens
-        )
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": prompt}
+        ]
         
-        return {"analysis": completion.choices[0].message.parsed} 
+        try:
+            console.log("[cyan]Sending request to OpenAI...[/cyan]")
+            completion = self.client.chat.completions.create(
+                model=settings.llm.model,
+                messages=messages,
+                response_format={"type": "json_object"},
+                temperature=settings.llm.temperature,
+                max_tokens=settings.llm.max_tokens
+            )
+            
+            # Track token usage
+            self.token_counter.track_completion(
+                messages=messages,
+                completion_tokens=completion.usage.completion_tokens
+            )
+            
+            # Log the raw response for debugging
+            console.log(f"[cyan]Raw LLM response:[/cyan] {completion.choices[0].message.content}")
+            
+            # Parse the response into our schema
+            analysis = IntertextualAnalysis.model_validate_json(
+                completion.choices[0].message.content
+            )
+            
+            result = {"analysis": analysis}
+            console.log(f"[green]Analysis result created successfully[/green]")
+            return result
+            
+        except Exception as e:
+            console.print(f"[red]Error in LLM analysis: {str(e)}[/red]")
+            console.print(f"[red]Input data: {input_data}[/red]")
+            raise 

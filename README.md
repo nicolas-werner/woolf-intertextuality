@@ -21,21 +21,21 @@ The experiment follows these steps:
 
 2. **Similarity Detection**:
    - Uses semantic search to find potential intertextual connections
+   - For each Dalloway passage:
+     * Finds top-k most similar Odyssey passages
+     * Finds top-k most dissimilar Odyssey passages for contrast
    - Scores passages based on embedding similarity
    - Filters results based on configurable thresholds
 
 3. **Analysis**:
-   - Implements a comparative prompt system to study the impact of expert knowledge:
-     - **Naive Prompt**: Based purely on Kristeva's intertextuality theory
-       * Provides baseline analysis without Woolf-specific knowledge
-       * Focuses on fundamental intertextual relationships
-       * Uses general literary analysis principles
-       * Serves as control group for comparison
-
-     - **Expert Prompt**: Enriched with Woolf's specific intertextual practices
-       * Incorporates detailed knowledge of Woolf's techniques
-       * Contains information about her Homeric transformation methods
-       * Tests if expert knowledge improves detection and analysis
+   - Analyzes both similar and dissimilar passage pairs
+   - Considers similarity type in the analysis
+   - Generates structured analysis with:
+     * Initial observations
+     * Analytical steps with evidence
+     * Counter-arguments
+     * Synthesis
+     * Textual intersections
 
 4. **Output Generation**:
    - Produces parallel analyses from both prompts for comparison

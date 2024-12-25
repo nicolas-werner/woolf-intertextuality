@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "woolf-intertextuality"
 version = "0.1.0"
@@ -19,4 +23,15 @@ dependencies = [
     "jinja2>=3.0.0",
     "scikit-learn>=1.6.0",
     "krippendorff>=0.8.0",
+    "tiktoken>=0.8.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]
+testpaths = [
+    "tests"
 ]

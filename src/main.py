@@ -13,6 +13,7 @@ from src.config.settings import settings
 from typing import List
 from sklearn.metrics.pairwise import cosine_similarity
 from src.evaluation.prepare_annotation_data import prepare_annotation_csv
+from src.utils.token_counter import TokenCounter
 
 console = Console()
 
@@ -50,22 +51,6 @@ def display_settings_table():
     
     console.print(table)
 
-def get_dissimilar_chunks(query_embedding: List[float], docs: List[Document], k: int = 2) -> List[Document]:
-    """Find the k most dissimilar chunks based on cosine similarity
-    
-    Args:
-        query_embedding: Embedding vector of query text
-        docs: List of documents to search
-        k: Number of dissimilar chunks to return
-    """
-    # Calculate similarities
-    for doc in docs:
-        doc.score = 1 - cosine_similarity(query_embedding, doc.embedding)
-    
-    # Sort by dissimilarity (highest score = most dissimilar)
-    sorted_docs = sorted(docs, key=lambda x: x.score, reverse=True)
-    return sorted_docs[:k]
-
 def main():
     args = parse_args()
     
@@ -74,7 +59,8 @@ def main():
     
     # Initialize components
     data_manager = DataManager()
-    pipeline = PipelineFacade()
+    token_counter = TokenCounter()
+    pipeline = PipelineFacade(token_counter=token_counter)
     
     # Load data
     console.log("📚 Loading and preparing documents")
@@ -99,26 +85,38 @@ def main():
         TextColumn("[progress.description]{task.description}"),
         TimeRemainingColumn(),
         console=console,
-        transient=False  # Make progress bar sticky
+        transient=False
     ) as progress:
-        # Main analysis task
-        analysis_task = progress.add_task(
-            f"[cyan]Processing Mrs Dalloway chunks...", 
+        # Add task for overall Dalloway chunks
+        dalloway_task = progress.add_task(
+            "[cyan]Processing Mrs Dalloway chunks...", 
             total=total_queries
+        )
+        
+        # Add task for passage analysis (2 similar + 2 dissimilar per chunk)
+        analysis_task = progress.add_task(
+            "[cyan]Analyzing passages...",
+            total=total_queries * 4  # 2 similar + 2 dissimilar passages per chunk
         )
         
         for i, query_doc in enumerate(query_chunks, 1):
             query_text = query_doc.content
             
-            # Find similar passages
-            similar_docs = pipeline.find_similar_passages(query_text)
+            # Update Dalloway progress description
+            progress.update(
+                dalloway_task,
+                description=f"[cyan]Processing Dalloway chunk {i}/{total_queries}"
+            )
             
-            # Analyze each similar passage
-            for j, doc in enumerate(similar_docs, 1):
-                # Update progress description for each similar chunk
+            # Find similar and dissimilar passages
+            all_docs = pipeline.find_similar_passages(query_text)
+            
+            # Analyze each passage pair
+            for j, doc in enumerate(all_docs, 1):
+                # Update analysis progress description
                 progress.update(
                     analysis_task,
-                    description=f"[cyan]Analyzing similar chunk {j}/{len(similar_docs)} of Dalloway chunk {i}/{total_queries}"
+                    description=f"[cyan]Analyzing {doc.meta['similarity_type']} passage {j}/{len(all_docs)} for chunk {i}/{total_queries}"
                 )
                 
                 # Perform intertextual analysis
@@ -130,8 +128,8 @@ def main():
                     'odyssey_text': doc.content,
                     'odyssey_chapter': doc.meta['chapter'],
                     'similarity_score': doc.score,
-                    'similarity_type': doc.meta.get('similarity_type', 'similar'),  # Add similarity type
-                    'prompt_type': settings.llm.prompt_template,  # Add prompt type
+                    'similarity_type': doc.meta['similarity_type'],  # This will now be 'similar' or 'dissimilar'
+                    'prompt_type': settings.llm.prompt_template,
                     
                     # Thought Process
                     'initial_observation': analysis.thought_process.initial_observation,
@@ -160,9 +158,12 @@ def main():
                     'critique': analysis.critique
                 }
                 results.append(result)
+                
+                # Update analysis progress for each passage analyzed
+                progress.update(analysis_task, advance=1)
             
-            # Update progress
-            progress.update(analysis_task, advance=1)
+            # Update Dalloway progress
+            progress.update(dalloway_task, advance=1)
     
     # Save results to CSV with timestamp
     output_dir = Path("data/results")
@@ -226,6 +227,9 @@ def main():
     # Prepare annotation version
     annotation_path = prepare_annotation_csv(output_path)
     console.log(f"[green]✓[/green] Prepared annotation file: {annotation_path}")
+    
+    # Print token usage report before exiting
+    token_counter.print_usage_report()
 
 if __name__ == "__main__":
     main()
