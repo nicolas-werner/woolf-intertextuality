@@ -115,7 +115,6 @@ def main():
                     "similarity_score": doc.score,
                     "similarity_type": doc.meta["similarity_type"],
                     "prompt_type": settings.llm.prompt_template,
-                    
                     # Thought Process
                     "initial_observation": analysis.thought_process.initial_observation,
                     "analytical_steps": [
@@ -125,12 +124,14 @@ def main():
                         }
                         for step in analysis.thought_process.analytical_steps
                     ],
-                    "counter_arguments": ";".join(analysis.thought_process.counter_arguments),
+                    "counter_arguments": ";".join(
+                        analysis.thought_process.counter_arguments
+                    ),
                     "synthesis": analysis.thought_process.synthesis,
                     "theoretical_grounding": ";".join(
-                        f"{k}: {v}" for k, v in analysis.thought_process.theoretical_grounding.items()
+                        f"{k}: {v}"
+                        for k, v in analysis.thought_process.theoretical_grounding.items()
                     ),
-                    
                     # Structured Analysis
                     "is_meaningful": analysis.structured_analysis.is_meaningful,
                     "confidence": analysis.structured_analysis.confidence,
@@ -177,14 +178,14 @@ def main():
         "odyssey_text",
         "odyssey_chapter",
         "similarity_score",
-        "similarity_type",  
-        "prompt_type",  
+        "similarity_type",
+        "prompt_type",
         # Analysis results
         "is_meaningful",
         "confidence",
         # Thought process
         "initial_observation",
-        "analytical_steps",  
+        "analytical_steps",
         "counter_arguments",
         "synthesis",
         # Textual intersections
@@ -194,7 +195,7 @@ def main():
         "meaning_transformation",
         # Evidence and critique
         "supporting_evidence",
-        "critique",  
+        "critique",
     ]
 
     existing_columns = [col for col in column_order if col in df.columns]

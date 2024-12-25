@@ -6,8 +6,8 @@ TransformationType = Literal["thematic", "structural", "linguistic", "cultural"]
 IntersectionType = Literal[
     "intertextual",  # Direct quotations, allusions (Genette)
     "hypertextual",  # Transformative reworkings (Genette)
-    "dialogic",      # Dynamic interplay (Kristeva)
-    "pragmatic"      # Effective presence (Schubert)
+    "dialogic",  # Dynamic interplay (Kristeva)
+    "pragmatic",  # Effective presence (Schubert)
 ]
 
 
@@ -28,11 +28,11 @@ class TextualIntersection(BaseModel):
     )
     feminist_reimagining: str = Field(
         description="How Woolf reinterprets male-centric narratives from a feminist perspective.",
-        default=None
+        default=None,
     )
     integration_technique: str = Field(
         description="How Woolf subtly integrates the reference (e.g., hermetic, structural, thematic).",
-        default=None
+        default=None,
     )
 
 
@@ -43,8 +43,7 @@ class AnalysisStep(BaseModel):
         description="Description of the analysis performed at this step."
     )
     evidence: str = Field(
-        description="supporting evidence or reasoning for this step.",
-        default=None
+        description="supporting evidence or reasoning for this step.", default=None
     )
 
 
@@ -65,7 +64,7 @@ class AnalysisThoughtProcess(BaseModel):
     )
     theoretical_grounding: Optional[Dict[str, str]] = Field(
         description="How the analysis applies Kristeva, Genette, and Schubert's theories.",
-        default_factory=dict
+        default_factory=dict,
     )
 
 

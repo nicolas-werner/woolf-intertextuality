@@ -46,7 +46,7 @@ def test_analysis_step(pipeline, sample_documents, mock_openai, monkeypatch):
     assert isinstance(analysis.structured_analysis.is_meaningful, bool)
     assert analysis.structured_analysis.confidence in ["low", "medium", "high"]
     assert len(analysis.structured_analysis.intersections) > 0
-    
+
     # Test new fields
     intersection = analysis.structured_analysis.intersections[0]
     assert intersection.feminist_reimagining is not None

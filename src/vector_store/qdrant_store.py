@@ -11,8 +11,8 @@ class QdrantManager:
     def __init__(self, embedding_dim: int = settings.embeddings.dimension):
         """Initialize QdrantManager"""
         self.document_store = QdrantDocumentStore(
-            path=":memory:", 
-            recreate_index=True,  
+            path=":memory:",
+            recreate_index=True,
             return_embedding=True,
             wait_result_from_api=True,
             embedding_dim=embedding_dim,

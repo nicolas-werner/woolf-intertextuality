@@ -16,7 +16,7 @@ class DataManager:
     def __init__(self):
         self.preprocessor = TextPreprocessor()
         self.data_store = PreprocessedDataStore()
-        self.embedder = OpenAIEmbedder(document_store=None)  
+        self.embedder = OpenAIEmbedder(document_store=None)
 
     def prepare_odyssey_chunks(self) -> List[Document]:
         """Process The Odyssey text and save with embeddings"""

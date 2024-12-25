@@ -37,7 +37,7 @@ class SimilaritySearchStep(PipelineStep):
         all_docs = self.document_store._query_by_embedding(
             query_embedding=query_embedding,
             filters={},
-            top_k=None,  
+            top_k=None,
             return_embedding=True,
             scale_score=True,
         )
@@ -48,13 +48,17 @@ class SimilaritySearchStep(PipelineStep):
             if not hasattr(doc, "meta"):
                 doc.meta = {}
             doc.meta["similarity_type"] = "similar"
-            console.log(f"[cyan]Similar passage (score: {doc.score:.3f}): {doc.content[:100]}...[/cyan]")
+            console.log(
+                f"[cyan]Similar passage (score: {doc.score:.3f}): {doc.content[:100]}...[/cyan]"
+            )
 
         for doc in dissimilar_docs:
             if not hasattr(doc, "meta"):
                 doc.meta = {}
             doc.meta["similarity_type"] = "dissimilar"
-            console.log(f"[yellow]Dissimilar passage (score: {doc.score:.3f}): {doc.content[:100]}...[/yellow]")
+            console.log(
+                f"[yellow]Dissimilar passage (score: {doc.score:.3f}): {doc.content[:100]}...[/yellow]"
+            )
 
         input_data["similar_documents"] = similar_docs + dissimilar_docs
         return input_data

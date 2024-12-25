@@ -34,8 +34,8 @@ class MockOpenAI:
                 "theoretical_grounding": {
                     "kristeva": "Mock Kristeva application",
                     "genette": "Mock Genette analysis",
-                    "schubert": "Mock Schubert approach"
-                }
+                    "schubert": "Mock Schubert approach",
+                },
             },
             "structured_analysis": {
                 "is_meaningful": True,
@@ -47,12 +47,12 @@ class MockOpenAI:
                         "dialogic_aspects": "intertextual",
                         "meaning_transformation": "Mock meaning transformation description",
                         "feminist_reimagining": "Mock feminist reinterpretation",
-                        "integration_technique": "hermetic"
+                        "integration_technique": "hermetic",
                     }
                 ],
                 "supporting_evidence": ["Mock evidence for the analysis"],
             },
-            "critique": "Mock critique of the analysis"
+            "critique": "Mock critique of the analysis",
         }
 
         # Ensure clean JSON serialization
