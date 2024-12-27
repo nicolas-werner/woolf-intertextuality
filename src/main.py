@@ -25,6 +25,13 @@ def parse_args():
         help="Limit the number of Dalloway queries to process",
         default=None,
     )
+    parser.add_argument(
+        "--prompt-template",
+        type=str,
+        choices=["expert_prompt", "naive_prompt"],
+        help="Choose the prompt template to use (overrides settings.py)",
+        default=None,
+    )
     return parser.parse_args()
 
 
@@ -54,6 +61,10 @@ def display_settings_table():
 
 def main():
     args = parse_args()
+
+    # Override prompt template if specified in command line
+    if args.prompt_template:
+        settings.llm.prompt_template = args.prompt_template
 
     display_settings_table()
 

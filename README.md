@@ -116,11 +116,20 @@ graph LR
 The analysis can be run directly using `main.py`:
 
 ```bash
-# Run analysis on all chunks
+# Run analysis on all chunks with default settings (expert prompt)
 python -m src.main
+
+# Run analysis with naive prompt
+python -m src.main --prompt-template naive_prompt
+
+# Run analysis with expert prompt (explicit)
+python -m src.main --prompt-template expert_prompt
 
 # Limit analysis to first N chunks (for testing and money saving reasons)
 python -m src.main --limit 5
+
+# Combine options
+python -m src.main --prompt-template naive_prompt --limit 5
 ```
 
 The script will:
@@ -128,7 +137,7 @@ The script will:
 1. Load and preprocess both texts
 2. Index The Odyssey chunks for similarity search
 3. Process each Mrs Dalloway chunk to find similar passages
-4. Perform intertextual analysis
+4. Perform intertextual analysis using the specified prompt template
 5. Save results to a timestamped CSV file in `data/results/`
 
 ### Output
