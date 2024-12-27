@@ -33,11 +33,12 @@ class DataManager:
 
         return self.data_store.load_chunks(output_path)
 
-    def prepare_dalloway_queries(self, sample_size: int = 20) -> List[Document]:
+    def prepare_dalloway_queries(self, sample_size: int = 20, random_seed: int = 42) -> List[Document]:
         """Process Mrs Dalloway text into query chunks and randomly sample
 
         Args:
             sample_size: Number of chunks to randomly sample (default: 20)
+            random_seed: Seed for random sampling to ensure consistency (default: 42)
         """
         output_path = settings.texts["dalloway"].query_path
 
@@ -52,7 +53,12 @@ class DataManager:
             queries = self.data_store.load_chunks(output_path)
 
         if sample_size and sample_size < len(queries):
-            return random.sample(queries, sample_size)
+            # Set random seed for reproducible sampling
+            random.seed(random_seed)
+            sampled_queries = random.sample(queries, sample_size)
+            # Reset random seed to avoid affecting other random operations
+            random.seed()
+            return sampled_queries
         return queries
 
     def load_data(self) -> Tuple[List[Document], List[Document]]:
