@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 import tiktoken
 from rich.console import Console
 
@@ -33,6 +33,17 @@ class TokenCounter:
         """Count tokens for a given text"""
         return len(self.encoding.encode(text))
 
+    def count_message_tokens(self, messages: List[Dict[str, str]]) -> int:
+        """Count tokens in a message list for chat completion"""
+        num_tokens = 0
+        for message in messages:
+            # Every message follows <im_start>{role/name}\n{content}<im_end>\n
+            num_tokens += 4
+            for key, value in message.items():
+                num_tokens += self.count_tokens(value)
+        num_tokens += 2  # Every reply is primed with <im_start>assistant
+        return num_tokens
+
     def track_embedding(self, texts: List[str]):
         """Track token usage for embeddings"""
         total_tokens = sum(self.count_tokens(text) for text in texts)
@@ -41,37 +52,18 @@ class TokenCounter:
         self.usage["embedding"]["tokens"] += total_tokens
         self.usage["embedding"]["cost"] += cost
 
-    def track_completion(
-        self,
-        messages: List[Dict[str, str]],
-        completion_tokens: int,
-        cached: bool = False,
-    ):
-        """Track token usage for chat completions
+    def track_completion(self, messages: List[Dict[str, str]], completion_tokens: Optional[int] = None):
+        """Track token usage for a completion."""
+        prompt_tokens = self.count_message_tokens(messages)
+        
+        if completion_tokens is not None:
+            self.usage["completion"]["output_tokens"] += completion_tokens
+            output_cost = (completion_tokens / 1000) * self.PRICING["gpt-4o"]["output"]
+            self.usage["completion"]["cost"] += output_cost
 
-        Args:
-            messages: List of message dictionaries
-            completion_tokens: Number of tokens in the completion
-            cached: Whether the input was cached (uses lower pricing)
-        """
-        input_tokens = sum(self.count_tokens(msg["content"]) for msg in messages)
-
-        input_price = (
-            self.PRICING["gpt-4o"]["cached_input"]
-            if cached
-            else self.PRICING["gpt-4o"]["input"]
-        )
-
-        input_cost = (input_tokens / 1000) * input_price
-        output_cost = (completion_tokens / 1000) * self.PRICING["gpt-4o"]["output"]
-
-        if cached:
-            self.usage["completion"]["cached_input_tokens"] += input_tokens
-        else:
-            self.usage["completion"]["input_tokens"] += input_tokens
-
-        self.usage["completion"]["output_tokens"] += completion_tokens
-        self.usage["completion"]["cost"] += input_cost + output_cost
+        self.usage["completion"]["input_tokens"] += prompt_tokens
+        input_cost = (prompt_tokens / 1000) * self.PRICING["gpt-4o"]["input"]
+        self.usage["completion"]["cost"] += input_cost
 
     def print_usage_report(self):
         """Print token usage and cost report"""

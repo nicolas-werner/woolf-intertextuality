@@ -10,3 +10,5 @@ writing/*
 .coverage*
 .ruff_cache
 uv.lock
+data/logs
+data/evaluation

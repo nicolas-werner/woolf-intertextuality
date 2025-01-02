@@ -3,7 +3,7 @@ from haystack import Document
 from rich.console import Console
 from .orchestrator import PipelineOrchestrator
 from src.utils.token_counter import TokenCounter
-from src.pipeline.steps.intertextual_analysis import IntertextualAnalysis
+from src.models.schemas import IntertextualityAnalysisResult
 
 console = Console()
 
@@ -25,7 +25,7 @@ class PipelineFacade:
 
     def analyze_similarity(
         self, query_text: str, document: Document
-    ) -> IntertextualAnalysis:
+    ) -> IntertextualityAnalysisResult:
         """Analyze similarity between query text and document"""
         try:
             result = self.orchestrator.execute(

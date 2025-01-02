@@ -21,38 +21,37 @@ class MockOpenAI:
     ) -> MockOpenAIResponse:
         """Mock chat completion"""
         mock_analysis = {
-            "thought_process": {
-                "initial_observation": "Mock observation about the passages",
-                "analytical_steps": [
+            "introduction": "Mock introduction to the analysis",
+            "process": {
+                "initial_observation": "Mock initial observation",
+                "steps": [
                     {
                         "step_description": "Mock analysis step",
-                        "evidence": "Mock textual evidence",
+                        "evidence": "Mock evidence",
+                        "theoretical_reference": "Mock theoretical framework",
+                        "contrasting_evidence": "Mock contrasting evidence",
                     }
                 ],
-                "counter_arguments": ["Mock counter argument"],
-                "synthesis": "Mock synthesis of the analysis",
-                "theoretical_grounding": {
-                    "kristeva": "Mock Kristeva application",
-                    "genette": "Mock Genette analysis",
-                    "schubert": "Mock Schubert approach",
-                },
+                "synthesis_with_implications": "Mock synthesis",
+                "counterpoints": ["Mock counterpoint 1", "Mock counterpoint 2"],
             },
-            "structured_analysis": {
-                "is_meaningful": True,
+            "intersections": {
                 "confidence": "high",
-                "intersections": [
+                "intersection_details": [
                     {
-                        "surface_elements": ["Mock element"],
-                        "transformation": "thematic",
-                        "dialogic_aspects": "intertextual",
-                        "meaning_transformation": "Mock meaning transformation description",
-                        "feminist_reimagining": "Mock feminist reinterpretation",
-                        "integration_technique": "hermetic",
+                        "specific_elements": ["Mock element 1", "Mock element 2"],
+                        "relationship_types": ["intertextual", "dialogic"],
+                        "transformation_types": ["thematic", "cultural"],
+                        "meaning_analysis": "Mock meaning analysis",
+                        "contextual_significance": "Mock contextual significance",
+                        "relationship_evaluation": "Mock relationship evaluation",
                     }
                 ],
-                "supporting_evidence": ["Mock evidence for the analysis"],
+                "evidence_passages": ["Mock evidence passage 1", "Mock evidence passage 2"],
+                "novelty": "Mock novel insight",
             },
-            "critique": "Mock critique of the analysis",
+            "critique": "Mock critique",
+            "recommendations": "Mock recommendations for future research",
         }
 
         # Ensure clean JSON serialization

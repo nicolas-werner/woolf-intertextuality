@@ -4,7 +4,7 @@ from haystack import Document
 from rich.console import Console
 from .base import PipelineStep
 from src.prompts.generator import PromptGenerator
-from src.models.schemas import IntertextualAnalysis
+from src.models.schemas import IntertextualityAnalysisResult
 from src.config.settings import settings
 from src.utils.token_counter import TokenCounter
 
@@ -45,27 +45,20 @@ class IntertextualAnalysisStep(PipelineStep):
 
         try:
             console.log("[cyan]Sending request to OpenAI...[/cyan]")
-            completion = self.client.chat.completions.create(
+            completion = self.client.beta.chat.completions.parse(
                 model=settings.llm.model,
                 messages=messages,
-                response_format={"type": "json_object"},
+                response_format=IntertextualityAnalysisResult,
                 temperature=settings.llm.temperature,
                 max_tokens=settings.llm.max_tokens,
             )
 
             self.token_counter.track_completion(
-                messages=messages, completion_tokens=completion.usage.completion_tokens
+                messages=messages,
+                completion_tokens=completion.usage.completion_tokens if hasattr(completion, 'usage') else None,
             )
 
-            console.log(
-                f"[cyan]Raw LLM response:[/cyan] {completion.choices[0].message.content}"
-            )
-
-            analysis = IntertextualAnalysis.model_validate_json(
-                completion.choices[0].message.content
-            )
-
-            result = {"analysis": analysis}
+            result = {"analysis": completion}
             console.log("[green]Analysis result created successfully[/green]")
             return result
 

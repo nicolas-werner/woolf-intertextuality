@@ -11,6 +11,7 @@ from src.data_preparation.data_manager import DataManager
 from src.config.settings import settings
 from src.evaluation.prepare_annotation_data import prepare_annotation_csv
 from src.utils.token_counter import TokenCounter
+import csv
 
 console = Console()
 
@@ -119,6 +120,9 @@ def main():
 
                 analysis = pipeline.analyze_similarity(query_text, doc)
 
+                # Extract the parsed data first for cleaner access
+                parsed_analysis = analysis.choices[0].message.parsed
+                
                 result = {
                     "dalloway_text": query_text,
                     "odyssey_text": doc.content,
@@ -126,37 +130,39 @@ def main():
                     "similarity_score": doc.score,
                     "similarity_type": doc.meta["similarity_type"],
                     "prompt_type": settings.llm.prompt_template,
-                    # Thought Process
-                    "initial_observation": analysis.thought_process.initial_observation,
+                    # Introduction and high-level analysis
+                    "introduction": parsed_analysis.introduction,
+                    # Process details
+                    "initial_observation": parsed_analysis.process.initial_observation,
                     "analytical_steps": [
                         {
                             "step_description": step.step_description,
                             "evidence": step.evidence,
+                            "theoretical_reference": step.theoretical_reference,
+                            "contrasting_evidence": step.contrasting_evidence,
                         }
-                        for step in analysis.thought_process.analytical_steps
+                        for step in parsed_analysis.process.steps
                     ],
-                    "counter_arguments": ";".join(
-                        analysis.thought_process.counter_arguments
-                    ),
-                    "synthesis": analysis.thought_process.synthesis,
-                    "theoretical_grounding": ";".join(
-                        f"{k}: {v}"
-                        for k, v in analysis.thought_process.theoretical_grounding.items()
-                    ),
-                    # Structured Analysis
-                    "is_meaningful": analysis.structured_analysis.is_meaningful,
-                    "confidence": analysis.structured_analysis.confidence,
+                    "synthesis": parsed_analysis.process.synthesis_with_implications,
+                    "counter_arguments": ";".join(parsed_analysis.process.counterpoints),
+                    # Intersection details
+                    "confidence": parsed_analysis.intersections.confidence,
                     "textual_intersections": [
                         {
-                            "surface_elements": ";".join(intersection.surface_elements),
-                            "transformation": intersection.transformation,
-                            "dialogic_aspects": intersection.dialogic_aspects,
-                            "meaning_transformation": intersection.meaning_transformation,
-                            "feminist_reimagining": intersection.feminist_reimagining,
-                            "integration_technique": intersection.integration_technique,
+                            "specific_elements": ";".join(intersection.specific_elements),
+                            "relationship_types": ";".join(intersection.relationship_types),
+                            "transformation_types": ";".join(intersection.transformation_types),
+                            "meaning_analysis": intersection.meaning_analysis,
+                            "contextual_significance": intersection.contextual_significance,
+                            "relationship_evaluation": intersection.relationship_evaluation,
                         }
-                        for intersection in analysis.structured_analysis.intersections
+                        for intersection in parsed_analysis.intersections.intersection_details
                     ],
+                    "evidence_passages": ";".join(parsed_analysis.intersections.evidence_passages),
+                    "novelty": parsed_analysis.intersections.novelty,
+                    # Critique and recommendations
+                    "critique": parsed_analysis.critique,
+                    "recommendations": parsed_analysis.recommendations,
                 }
                 results.append(result)
 
@@ -173,6 +179,7 @@ def main():
 
     df = pd.DataFrame(results)
 
+    # Simple flattening of textual intersections
     df["textual_intersection"] = df["textual_intersections"].apply(
         lambda x: x[0] if x else None
     )
@@ -191,22 +198,26 @@ def main():
         "similarity_score",
         "similarity_type",
         "prompt_type",
-        # Analysis results
-        "is_meaningful",
-        "confidence",
-        # Thought process
+        # Introduction
+        "introduction",
+        # Process details
         "initial_observation",
         "analytical_steps",
-        "counter_arguments",
         "synthesis",
-        # Textual intersections
-        "surface_elements",
-        "transformation",
-        "dialogic_aspects",
-        "meaning_transformation",
-        # Evidence and critique
-        "supporting_evidence",
+        "counter_arguments",
+        # Intersection analysis
+        "confidence",
+        "specific_elements",
+        "relationship_types",
+        "transformation_types",
+        "meaning_analysis",
+        "contextual_significance",
+        "relationship_evaluation",
+        "evidence_passages",
+        "novelty",
+        # Critique and recommendations
         "critique",
+        "recommendations",
     ]
 
     existing_columns = [col for col in column_order if col in df.columns]
@@ -215,6 +226,7 @@ def main():
 
     df = df[final_column_order]
 
+    # Simple CSV writing
     df.to_csv(output_path, index=False, encoding="utf-8")
     console.print(
         f"\n[bold green]✅ Analysis results saved to {output_path}[/bold green]"
