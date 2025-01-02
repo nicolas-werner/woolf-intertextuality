@@ -7,6 +7,7 @@ from src.embeddings.openai_embedder import OpenAIEmbedder
 from src.vector_store.qdrant_store import QdrantManager
 from src.prompts.generator import PromptGenerator
 from src.utils.token_counter import TokenCounter
+from src.models.schemas import Analysis
 
 from .steps.document_indexing import DocumentIndexingStep
 from .steps.similarity_search import SimilaritySearchStep
@@ -41,7 +42,7 @@ class PipelineOrchestrator:
             token_counter=token_counter,
         )
 
-    def execute(self, initial_data: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, initial_data: Dict[str, Any]) -> Dict[str, Any] | Analysis:
         """Execute the appropriate pipeline steps based on input data"""
         current_data = initial_data.copy()
 
@@ -51,9 +52,7 @@ class PipelineOrchestrator:
 
             elif "query_text" in current_data and "document" in current_data:
                 console.log("[cyan]Executing analysis step...[/cyan]")
-                result = self.analysis_step.execute(current_data)
-                console.log(f"[cyan]Analysis step result: {result}[/cyan]")
-                current_data.update(result)
+                return self.analysis_step.execute(current_data)
 
             elif "query_text" in current_data:
                 current_data = self.search_step.execute(current_data)

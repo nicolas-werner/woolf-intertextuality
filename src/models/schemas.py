@@ -40,6 +40,14 @@ class ThinkingStep(BaseModel):
             "- Recognized significant variation"
         )
     )
+    confidence: ConfidenceLevel = Field(
+        description=(
+            "Confidence in this step's conclusion:\n"
+            "- low: Speculative or requires more evidence\n"
+            "- medium: Clear connection but interpretive questions remain\n"
+            "- high: Strong textual and theoretical support"
+        )
+    )
     next_thought: str = Field(
         description=(
             "Based on this result, what should be considered next. For example:\n"
@@ -49,14 +57,7 @@ class ThinkingStep(BaseModel):
             "- Evaluate significance within modernist context"
         )
     )
-    confidence: ConfidenceLevel = Field(
-        description=(
-            "Confidence in this step's conclusion:\n"
-            "- low: Speculative or requires more evidence\n"
-            "- medium: Clear connection but interpretive questions remain\n"
-            "- high: Strong textual and theoretical support"
-        )
-    )
+    
 
 class Connection(BaseModel):
     """Details of a specific intertextual connection based on Genette's framework."""
@@ -103,6 +104,39 @@ class Connection(BaseModel):
         )
     )
 
+class Evaluation(BaseModel):
+    """Critical evaluation of the transtextual relationships"""
+    intentionality: str = Field(
+        description="Critical analysis of deliberate engagement with Homer"
+    )
+    significance: str = Field(
+        description="Literary and theoretical importance of connections"
+    )
+    interpretation: str = Field(
+        description="How connections contribute to meaning"
+    )
+    uncertainties: str = Field(
+        description="Could the connection be interpreted differently? Is it possible that the connection is not intentional?"
+    )
+
+class Summary(BaseModel):
+    """Synthesis of analysis"""
+    meaningful_relationship: bool = Field(
+        description="Whether a meaningful relationship exists between the texts"
+    )
+    primary_connection_type: ConnectionType = Field(
+        description="Primary type of transtextual relationship identified"
+    )
+    key_evidence: str = Field(
+        description="Most significant textual evidence supporting the connection"
+    )
+    transformation_analysis: str = Field(
+        description="How Woolf engages with and transforms Homer"
+    )
+    literary_significance: str = Field(
+        description="Broader implications for interpretation"
+    )
+
 class Analysis(BaseModel):
     """The complete transtextual analysis following Genette's framework."""
     initial_observations: str = Field(
@@ -134,25 +168,12 @@ class Analysis(BaseModel):
         )
     )
     
-    evaluation: dict = Field(
-        description="Critical evaluation of the transtextual relationships",
-        example={
-            "intentionality": "Analysis of deliberate engagement with Homer",
-            "significance": "Literary and theoretical importance of connections",
-            "interpretation": "How connections contribute to meaning",
-            "uncertainties": "Areas requiring further investigation"
-        }
+    evaluation: Evaluation = Field(
+        description="Critical evaluation of the transtextual relationships"
     )
     
-    summary: dict = Field(
-        description="Synthesis of analysis",
-        example={
-            "meaningful_relationship": bool,
-            "primary_connection_type": ConnectionType,
-            "key_evidence": "Most significant textual evidence",
-            "transformation_analysis": "How Woolf engages with and transforms Homer",
-            "literary_significance": "Broader implications for interpretation"
-        }
+    summary: Summary = Field(
+        description="Synthesis of analysis"
     )
 
 

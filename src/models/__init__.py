@@ -1,17 +1,15 @@
 from .schemas import (
-    IntertextualityAnalysisResult,
-    IntertextualAnalysisProcess,
-    AnalyticalStep,
+    Analysis,
+    ThinkingStep,
+    Connection,
+    ConnectionType,
     ConfidenceLevel,
-    IntersectionDetail,
-    IntersectionAnalysis,
 )
 
 __all__ = [
-    "IntertextualityAnalysisResult",
-    "IntertextualAnalysisProcess",
-    "AnalyticalStep",
+    "Analysis",
+    "ThinkingStep",
+    "Connection",
+    "ConnectionType",
     "ConfidenceLevel",
-    "IntersectionDetail",
-    "IntersectionAnalysis",
 ]

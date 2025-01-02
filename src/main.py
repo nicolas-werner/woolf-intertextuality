@@ -12,6 +12,9 @@ from src.config.settings import settings
 from src.evaluation.prepare_annotation_data import prepare_annotation_csv
 from src.utils.token_counter import TokenCounter
 import csv
+import json
+from haystack import Document
+from src.models.schemas import Analysis
 
 console = Console()
 
@@ -60,6 +63,29 @@ def display_settings_table():
     console.print(table)
 
 
+def process_analysis_results(analysis: Analysis, query_text: str, doc: Document):
+    """Convert analysis to dictionary format for DataFrame"""
+    # The analysis is now directly the Analysis object
+    return {
+        # Core metadata
+        "dalloway_text": query_text,
+        "odyssey_text": doc.content,
+        "odyssey_chapter": doc.meta.get("chapter", ""),
+        "similarity_score": doc.score,
+        "similarity_type": doc.meta["similarity_type"],
+        "prompt_type": settings.llm.prompt_template,
+        
+        # Analysis components
+        "initial_observations": analysis.initial_observations,
+        
+        # Convert Pydantic models to dictionaries for JSON serialization
+        "thinking_steps": json.dumps([step.model_dump() for step in analysis.thinking_steps]),
+        "connections": json.dumps([conn.model_dump() for conn in analysis.connections]),
+        "evaluation": json.dumps(analysis.evaluation.model_dump()),
+        "summary": json.dumps(analysis.summary.model_dump())
+    }
+
+
 def main():
     args = parse_args()
 
@@ -99,7 +125,7 @@ def main():
 
         analysis_task = progress.add_task(
             "[cyan]Analyzing passages...",
-            total=total_queries * 4,  # 2 similar + 2 dissimilar passages per chunk
+            total=total_queries * 2,  # 1 similar + 1 dissimilar passage per chunk
         )
 
         for i, query_doc in enumerate(query_chunks, 1):
@@ -119,51 +145,7 @@ def main():
                 )
 
                 analysis = pipeline.analyze_similarity(query_text, doc)
-
-                # Extract the parsed data first for cleaner access
-                parsed_analysis = analysis.choices[0].message.parsed
-                
-                result = {
-                    "dalloway_text": query_text,
-                    "odyssey_text": doc.content,
-                    "odyssey_chapter": doc.meta["chapter"],
-                    "similarity_score": doc.score,
-                    "similarity_type": doc.meta["similarity_type"],
-                    "prompt_type": settings.llm.prompt_template,
-                    # Introduction and high-level analysis
-                    "introduction": parsed_analysis.introduction,
-                    # Process details
-                    "initial_observation": parsed_analysis.process.initial_observation,
-                    "analytical_steps": [
-                        {
-                            "step_description": step.step_description,
-                            "evidence": step.evidence,
-                            "theoretical_reference": step.theoretical_reference,
-                            "contrasting_evidence": step.contrasting_evidence,
-                        }
-                        for step in parsed_analysis.process.steps
-                    ],
-                    "synthesis": parsed_analysis.process.synthesis_with_implications,
-                    "counter_arguments": ";".join(parsed_analysis.process.counterpoints),
-                    # Intersection details
-                    "confidence": parsed_analysis.intersections.confidence,
-                    "textual_intersections": [
-                        {
-                            "specific_elements": ";".join(intersection.specific_elements),
-                            "relationship_types": ";".join(intersection.relationship_types),
-                            "transformation_types": ";".join(intersection.transformation_types),
-                            "meaning_analysis": intersection.meaning_analysis,
-                            "contextual_significance": intersection.contextual_significance,
-                            "relationship_evaluation": intersection.relationship_evaluation,
-                        }
-                        for intersection in parsed_analysis.intersections.intersection_details
-                    ],
-                    "evidence_passages": ";".join(parsed_analysis.intersections.evidence_passages),
-                    "novelty": parsed_analysis.intersections.novelty,
-                    # Critique and recommendations
-                    "critique": parsed_analysis.critique,
-                    "recommendations": parsed_analysis.recommendations,
-                }
+                result = process_analysis_results(analysis, query_text, doc)
                 results.append(result)
 
                 progress.update(analysis_task, advance=1)
@@ -177,56 +159,32 @@ def main():
     )
     output_path = output_dir / output_filename
 
-    df = pd.DataFrame(results)
-
-    # Simple flattening of textual intersections
-    df["textual_intersection"] = df["textual_intersections"].apply(
-        lambda x: x[0] if x else None
-    )
-
-    intersection_df = pd.DataFrame(df["textual_intersection"].tolist())
-
-    df = df.drop(["textual_intersections", "textual_intersection"], axis=1).join(
-        intersection_df
-    )
-
+    # Update column order for DataFrame
     column_order = [
-        # Core text chunks
+        # Core metadata
         "dalloway_text",
         "odyssey_text",
         "odyssey_chapter",
         "similarity_score",
         "similarity_type",
         "prompt_type",
-        # Introduction
-        "introduction",
-        # Process details
-        "initial_observation",
-        "analytical_steps",
-        "synthesis",
-        "counter_arguments",
-        # Intersection analysis
-        "confidence",
-        "specific_elements",
-        "relationship_types",
-        "transformation_types",
-        "meaning_analysis",
-        "contextual_significance",
-        "relationship_evaluation",
-        "evidence_passages",
-        "novelty",
-        # Critique and recommendations
-        "critique",
-        "recommendations",
+        # Analysis components
+        "initial_observations",
+        "thinking_steps",
+        "connections",
+        # Evaluation and summary
+        "evaluation",
+        "summary"
     ]
 
+    df = pd.DataFrame(results)
+    
+    # Ensure all columns exist and are in correct order
     existing_columns = [col for col in column_order if col in df.columns]
     remaining_columns = [col for col in df.columns if col not in column_order]
-    final_column_order = existing_columns + remaining_columns
+    df = df[existing_columns + remaining_columns]
 
-    df = df[final_column_order]
-
-    # Simple CSV writing
+    # Save results
     df.to_csv(output_path, index=False, encoding="utf-8")
     console.print(
         f"\n[bold green]✅ Analysis results saved to {output_path}[/bold green]"

@@ -4,7 +4,7 @@ from haystack import Document
 from rich.console import Console
 from .base import PipelineStep
 from src.prompts.generator import PromptGenerator
-from src.models.schemas import IntertextualityAnalysisResult
+from src.models.schemas import Analysis
 from src.config.settings import settings
 from src.utils.token_counter import TokenCounter
 
@@ -48,7 +48,7 @@ class IntertextualAnalysisStep(PipelineStep):
             completion = self.client.beta.chat.completions.parse(
                 model=settings.llm.model,
                 messages=messages,
-                response_format=IntertextualityAnalysisResult,
+                response_format=Analysis,
                 temperature=settings.llm.temperature,
                 max_tokens=settings.llm.max_tokens,
             )
@@ -58,9 +58,8 @@ class IntertextualAnalysisStep(PipelineStep):
                 completion_tokens=completion.usage.completion_tokens if hasattr(completion, 'usage') else None,
             )
 
-            result = {"analysis": completion}
             console.log("[green]Analysis result created successfully[/green]")
-            return result
+            return completion.choices[0].message.parsed
 
         except Exception as e:
             console.print(f"[red]Error in LLM analysis: {str(e)}[/red]")
