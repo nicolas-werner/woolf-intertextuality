@@ -5,7 +5,8 @@ from pydantic import BaseModel, Field
 ConfidenceLevel = Literal["low", "medium", "high"]
 ConnectionType = Literal[
     "intertextual",    # Direct presence through quotation, allusion, or plagiarism
-    "hypertextual"     # Transformation or adaptation of earlier text
+    "hypertextual",     # Transformation or adaptation of earlier text
+    "none"
 ]
 
 class ThinkingStep(BaseModel):
