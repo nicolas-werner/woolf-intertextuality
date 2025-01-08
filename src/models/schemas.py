@@ -6,7 +6,7 @@ ConfidenceLevel = Literal["low", "medium", "high"]
 ConnectionType = Literal[
     "intertextual",    # Direct presence through quotation, allusion, or plagiarism
     "hypertextual",     # Transformation or adaptation of earlier text
-    "none"
+    "none" # No connection found
 ]
 
 class ThinkingStep(BaseModel):
