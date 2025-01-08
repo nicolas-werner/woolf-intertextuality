@@ -12,3 +12,4 @@ writing/*
 uv.lock
 data/logs
 data/evaluation
+hoff.md
