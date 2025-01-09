@@ -55,7 +55,8 @@ class ThinkingStep(BaseModel):
             "- Examine how this connection creates new meaning\n"
             "- Analyze how transformation serves Woolf's purposes\n"
             "- Consider broader patterns of engagement\n"
-            "- Evaluate significance within modernist context"
+            "- Evaluate significance within modernist context\n"
+            "- If you thought about everything: 'I can't think of anything else. No further thoughts needed'"
         )
     )
     
@@ -68,12 +69,13 @@ class Connection(BaseModel):
             "- intertextual: 'Effective presence of one text within another' through "
             "quotation, allusion, or similar phrases\n"
             "- hypertextual: 'Transformation or adaptation of an earlier text (hypotext) "
-            "into a new text (hypertext)'"
+            "into a new text (hypertext)'\n"
+            "- none: No connection found"
         )
     )
     text1_evidence: str = Field(
         description=(
-            "Relevant passage from the Odyssey (hypotext), including:\n"
+            "Relevant passage from the Odyssey, including:\n"
             "- Specific quotation or description\n"
             "- Context within the Odyssey\n"
             "- Significant elements or motifs"
@@ -81,7 +83,7 @@ class Connection(BaseModel):
     )
     text2_evidence: str = Field(
         description=(
-            "Relevant passage from Mrs. Dalloway (hypertext), showing:\n"
+            "Relevant passage from Mrs. Dalloway, showing:\n"
             "- How Woolf incorporates or transforms the Homeric material\n"
             "- Context within Mrs. Dalloway\n"
             "- Significance of the adaptation"
@@ -123,7 +125,7 @@ class Evaluation(BaseModel):
 class Summary(BaseModel):
     """Synthesis of analysis"""
     meaningful_relationship: bool = Field(
-        description="Whether a meaningful relationship exists between the texts"
+        description="Whether a meaningful connection exists between the texts"
     )
     primary_connection_type: ConnectionType = Field(
         description="Primary type of transtextual relationship identified"
