@@ -11,7 +11,7 @@ This study addresses fundamental methodological challenges in computational lite
 The methodology draws upon:
 - Genette's theory of transtextuality
 - Contemporary computational approaches to literary analysis
-- Advances in Large Language Model capabilities, particularly in-context learning
+- Advances in Large Language Model capabilities, particularly in-context learning, chain-of-thought prompting, and structured output generation
 
 ### Methodological Design
 
@@ -56,19 +56,10 @@ For the complete list of dependencies, see `pyproject.toml`.
 ```bash
 git clone https://github.com/yourusername/woolf-intertextuality.git
 cd woolf-intertextuality
-
-# Optional: Create virtual environment with correct Python version
-python -m venv .venv
-source .venv/bin/activate  # On Unix
-# or
-.venv\Scripts\activate  # On Windows
 ```
 
 2. Dependency Installation:
 ```bash
-# Using pip
-pip install -r requirements.txt
-
 # Using uv
 uv sync
 ```
@@ -76,7 +67,7 @@ uv sync
 3. Configuration:
 ```bash
 cp .env.example .env
-# Configure environment variables according to documentation
+# Configure environment variables according to OpenAI documentation
 ```
 
 ### Methodological Execution
@@ -84,26 +75,20 @@ cp .env.example .env
 The analysis pipeline can be executed using the following commands:
 
 ```bash
-# 1. Generate analysis files
+# 1. Generate analysis files (run twice)
 # Run expert analysis
-python -m src.main
+python -m src.main --prompt-template expert_prompt
 
 # Run naive analysis
 python -m src.main --prompt-template naive_prompt
 
-# 2. Create evaluation template
-# Combines both analyses and prepares template
+# Run expert analysis with a limit
+python -m src.main --limit 5 --prompt-template expert_prompt
+
+# 2. Prepare evaluation template
+# Combines expert and naive analyses into evaluation template
 python -m src.evaluation.create_eval_csv
 
-# 3. Run evaluations
-# Full evaluation
-python -m src.evaluation.evaluate_analyses
-
-# Or test with single row
-python -m src.evaluation.evaluate_analyses --test
-
-# Controlled experiment with limited scope
-python -m src.main --limit 5
 ```
 
 ### Output Structure
@@ -116,22 +101,14 @@ The analysis generates two categories of data:
    - Format: 
      - Analysis results: `intertextual_analysis_{prompt_type}_{model}_{timestamp}.csv`
 
-2. **Evaluation Materials** (`data/evaluation/`):
-   - Blind review protocols
-   - Inter-annotator agreement data
-   - Methodological validation metrics
+2. **Evaluation Materials**:
+   - Evaluation template combining expert and naive analyses
    - Format:
-     - Evaluation template: `evaluation_template.csv`
-     - Final evaluation: `evaluation_result.csv`
+     - Template: `evaluation_template.csv` (created by create_eval_csv.py)
 
 ### Evaluation Workflow
 
 The evaluation process follows these steps:
 
-1. Generate analysis files using both expert and naive prompts
-2. Create evaluation template by combining both analyses
-3. Run evaluations using GPT-4 to assess:
-   - Evidence Quality (1-5 scale)
-   - Theoretical Alignment (1-5 scale)
-   - Internal Consistency (1-5 scale)
-   - Additional Notes (optional observations)
+1. Run main.py twice to generate both expert and naive analyses
+2. Run create_eval_csv.py in `src/evaluation/` to combine analyses into evaluation template
