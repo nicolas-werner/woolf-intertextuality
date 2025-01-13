@@ -27,6 +27,7 @@ dependencies = [
     "pytest>=8.3.4",
     "pytest-cov>=6.0.0",
     "ruff>=0.3.0",
+    "streamlit>=1.41.1",
 ]
 
 [tool.pytest.ini_options]

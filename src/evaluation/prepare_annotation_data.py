@@ -45,29 +45,18 @@ def prepare_annotation_csv(results_path: str) -> str:
         "uncertainties": df["evaluation"].apply(
             lambda x: json.loads(x)["uncertainties"] if isinstance(x, str) else x.get("uncertainties")
         ),
-        
-        # Extract summary components
-        "meaningful_relationship": df["summary"].apply(
-            lambda x: json.loads(x)["meaningful_relationship"] if isinstance(x, str) else x.get("meaningful_relationship")
+        "conclusion": df["evaluation"].apply(
+            lambda x: json.loads(x)["conclusion"] if isinstance(x, str) else x.get("conclusion")
         ),
-        "primary_connection_type": df["summary"].apply(
-            lambda x: json.loads(x)["primary_connection_type"] if isinstance(x, str) else x.get("primary_connection_type")
-        ),
-        "key_evidence": df["summary"].apply(
-            lambda x: json.loads(x)["key_evidence"] if isinstance(x, str) else x.get("key_evidence")
-        ),
-        "transformation_analysis": df["summary"].apply(
-            lambda x: json.loads(x)["transformation_analysis"] if isinstance(x, str) else x.get("transformation_analysis")
-        ),
-        "literary_significance": df["summary"].apply(
-            lambda x: json.loads(x)["literary_significance"] if isinstance(x, str) else x.get("literary_significance")
+        "is_reference": df["evaluation"].apply(
+            lambda x: json.loads(x)["is_reference"] if isinstance(x, str) else x.get("is_reference")
         ),
     })
     
     # Add annotation columns
     annotation_df["annotator_name"] = ""
     annotation_df["annotation_date"] = ""
-    annotation_df["connection_quality"] = ""  # High/Medium/Low
+    annotation_df["connection_quality"] = ""
     annotation_df["theoretical_soundness"] = ""  # High/Medium/Low
     annotation_df["evidence_quality"] = ""  # High/Medium/Low
     annotation_df["notes"] = ""

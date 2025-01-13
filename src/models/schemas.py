@@ -56,18 +56,18 @@ class ThinkingStep(BaseModel):
             "- Analyze how transformation serves Woolf's purposes\n"
             "- Consider broader patterns of engagement\n"
             "- Evaluate significance within modernist context\n"
-            "- If you thought about everything: 'I can't think of anything else. No further thoughts needed'"
+            "- If no further thoughts are needed: 'I can't think of anything else. No further thoughts needed'"
         )
     )
     
 
 class Connection(BaseModel):
-    """Details of a specific intertextual connection based on Genette's framework."""
+    """Details of a specific transtextual relationship based on Genette's framework."""
     connection_type: ConnectionType = Field(
         description=(
             "The type of transtextual relationship identified:\n"
             "- intertextual: 'Effective presence of one text within another' through "
-            "quotation, allusion, or similar phrases\n"
+            "quotation, allusion, or plagiarism\n"
             "- hypertextual: 'Transformation or adaptation of an earlier text (hypotext) "
             "into a new text (hypertext)'\n"
             "- none: No connection found"
@@ -78,8 +78,8 @@ class Connection(BaseModel):
             "Relevant passage from the Odyssey, including:\n"
             "- Specific quotation or description\n"
             "- Context within the Odyssey\n"
-            "- Significant elements or motifs"
-        )
+            "- Significant elements or motifs"        
+            )
     )
     text2_evidence: str = Field(
         description=(
@@ -91,9 +91,9 @@ class Connection(BaseModel):
     )
     explanation: str = Field(
         description=(
-            "Analysis of the transtextual relationship, including:\n"
-            "- Nature of the connection (direct reference or transformation)\n"
-            "- How Woolf adapts or reinterprets Homer\n"
+            "Literary analysis of the potential transtextual relationship, including:\n"
+            "- Nature of the connection\n"
+            "- How Woolf adapts, references or reinterprets Homer\n"
             "- Purpose and effect of the connection\n"
             "- Contribution to broader themes and meanings"
         )
@@ -108,36 +108,24 @@ class Connection(BaseModel):
     )
 
 class Evaluation(BaseModel):
-    """Critical evaluation of the transtextual relationships"""
+    """Critical evaluation of the potential transtextual relationships"""
     intentionality: str = Field(
-        description="Critical analysis of deliberate engagement with Homer"
+        description="Critical analysis of the intentionality of the connections"
     )
     significance: str = Field(
-        description="Literary and theoretical importance of connections"
+        description="Synthesis of the significance of the connections"
     )
     interpretation: str = Field(
-        description="How connections contribute to meaning"
+        description="Possible interpretation of the connections"
     )
     uncertainties: str = Field(
-        description="Could the connection be interpreted differently? Is it possible that the connection is not intentional?"
+        description="Could the connections be interpreted differently? Is it possible that the connections are not intentional?"
     )
-
-class Summary(BaseModel):
-    """Synthesis of analysis"""
-    meaningful_relationship: bool = Field(
-        description="Whether a meaningful connection exists between the texts"
+    conclusion: str = Field(
+        description="Conclusion on whether a meaningful relationship exists between the texts based on the analysis"
     )
-    primary_connection_type: ConnectionType = Field(
-        description="Primary type of transtextual relationship identified"
-    )
-    key_evidence: str = Field(
-        description="Most significant textual evidence supporting the connection"
-    )
-    transformation_analysis: str = Field(
-        description="How Woolf engages with and transforms Homer"
-    )
-    literary_significance: str = Field(
-        description="Broader implications for interpretation"
+    is_reference: bool = Field(
+        description="Whether the connections are references to the Odyssey"
     )
 
 class Analysis(BaseModel):
@@ -147,7 +135,7 @@ class Analysis(BaseModel):
             "Preliminary analysis of the passages, including:\n"
             "- Initial identification of potential connections\n"
             "- Notable patterns of reference or transformation\n"
-            "- Key themes or motifs that suggest relationship"
+            "- Key elements that could suggest relationship"
         )
     )
     
@@ -156,27 +144,21 @@ class Analysis(BaseModel):
             "Systematic analysis process, showing:\n"
             "- Application of theoretical framework\n"
             "- Close reading and comparison\n"
-            "- Development of interpretation\n"
-            "- Critical evaluation of evidence and significance"
+            "- Development of interpretation"
         )
     )
     
     connections: List[Connection] = Field(
         description=(
-            "Detailed analysis of each transtextual relationship, examining:\n"
+            "Detailed analysis of each potential transtextual relationship, examining:\n"
             "- Type of connection (intertextual/hypertextual)\n"
             "- Evidence from both texts\n"
-            "- Nature of transformation or reference\n"
             "- Literary and theoretical significance"
         )
     )
     
     evaluation: Evaluation = Field(
-        description="Critical evaluation of the transtextual relationships"
-    )
-    
-    summary: Summary = Field(
-        description="Synthesis of analysis"
+        description="Synthesis and evaluation of the analysis"
     )
 
 

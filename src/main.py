@@ -65,7 +65,6 @@ def display_settings_table():
 
 def process_analysis_results(analysis: Analysis, query_text: str, doc: Document):
     """Convert analysis to dictionary format for DataFrame"""
-    # The analysis is now directly the Analysis object
     return {
         # Core metadata
         "dalloway_text": query_text,
@@ -82,7 +81,6 @@ def process_analysis_results(analysis: Analysis, query_text: str, doc: Document)
         "thinking_steps": json.dumps([step.model_dump() for step in analysis.thinking_steps]),
         "connections": json.dumps([conn.model_dump() for conn in analysis.connections]),
         "evaluation": json.dumps(analysis.evaluation.model_dump()),
-        "summary": json.dumps(analysis.summary.model_dump())
     }
 
 
@@ -172,9 +170,8 @@ def main():
         "initial_observations",
         "thinking_steps",
         "connections",
-        # Evaluation and summary
-        "evaluation",
-        "summary"
+        # Evaluation only (remove summary)
+        "evaluation"
     ]
 
     df = pd.DataFrame(results)
