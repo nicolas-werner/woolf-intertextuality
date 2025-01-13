@@ -19,3 +19,4 @@ evaluation_result*.csv
 analysis_evaluations_*.csv
 src/evaluation/*
 !src/evaluation/create_eval_csv.py
+!results.csv
