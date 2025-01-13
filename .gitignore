@@ -13,7 +13,6 @@ uv.lock
 data/logs
 data/evaluation
 hoff.md
-evaluation
 *.csv
 writing/*
 evaluation_result*.csv
