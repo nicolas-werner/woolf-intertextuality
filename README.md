@@ -1,284 +1,137 @@
-# Woolf Intertextuality Analysis
+# Computational Analysis of Intertextual Relationships: A Large Language Model Approach
 
-A pipeline for detecting and analyzing intertextual references between Virginia Woolf's "Mrs Dalloway" and Homer's "The Odyssey" using semantic search and large language models.
+This repository presents a methodological framework for investigating intertextual relationships through computational means, specifically examining the connections between Virginia Woolf's *Mrs Dalloway* and Homer's *Odyssey* using Large Language Models (LLMs) and semantic search techniques.
 
-## Project Overview
+## Research Context
 
-This project implements a Retrieval Augmented Generation (RAG) pipeline to identify and analyze potential intertextual references between Virginia Woolf's "Mrs Dalloway" and Homer's "The Odyssey". It combines:
+This study addresses fundamental methodological challenges in computational literary studies, particularly the operationalization of complex literary concepts for computational analysis. We investigate the capabilities and limitations of Large Language Models in detecting and analyzing sophisticated intertextual relationships, with specific attention to the integration of domain knowledge and theoretical frameworks.
 
-- Semantic search using embeddings to find similar passages
-- Large Language Model analysis to evaluate intertextual relationships
-- Structured output for a systematic analysis
+### Theoretical Framework
 
-## Experimental Design
+The methodology draws upon:
+- Genette's theory of transtextuality
+- Contemporary computational approaches to literary analysis
+- Advances in Large Language Model capabilities, particularly in-context learning
 
-The experiment follows these steps:
+### Methodological Design
 
-1. **Text Preprocessing**:
-   - Chunks both texts into semantically meaningful segments
-   - Preserves contextual information in chunk metadata (e.g. page number, chapter number - TBD might not be useful and removed later on)
-   - Generate (OpenAI) embeddings for similarity search
+The implementation comprises three integrated components:
 
-2. **Similarity Detection**:
-   - Uses semantic search to find potential intertextual connections
-   - For each Dalloway passage:
-     * Finds top-k most similar Odyssey passages
-     * Finds top-k most dissimilar Odyssey passages for contrast
-   - Scores passages based on embedding similarity
-   - Filters results based on configurable thresholds
+1. **Semantic Similarity Analysis**
+   - Vector embedding generation (OpenAI text-embedding-3-small)
+   - Cosine similarity computation for passage pair identification
+   - Bidirectional retrieval strategy (most/least similar passages)
 
-3. **Analysis**:
-   - Analyzes both similar and dissimilar passage pairs
-   - Considers similarity type in the analysis
-   - Generates structured analysis with:
-     * Initial observations
-     * Analytical steps with evidence
-     * Counter-arguments
-     * Synthesis
-     * Textual intersections
+2. **Domain Knowledge Integration**
+   - Expert-informed prompt engineering
+   - Integration of literary theoretical frameworks
+   - Structured analysis generation with attention to:
+     - Explicit and implicit intertextual markers
+     - Multiple operational levels (linguistic, structural, thematic)
+     - Feminist transformations of classical motifs
 
-4. **Output Generation**:
-   - Produces parallel analyses from both prompts for comparison
-   - Enables evaluation of how expert knowledge affects:
-     - Reference detection accuracy
-     - Analysis depth and sophistication
+3. **Evaluation Framework**
+   - Comparative analysis of expert vs. naive prompting approaches
+   - Multi-dimensional quality assessment (theoretical alignment, evidence quality, internal consistency)
+   - Systematic bias detection and analysis
 
-     - Recognition of Woolf's subtle integration techniques
-   - Facilitates systematic comparison through structured output
+## Technical Implementation
 
-### Pipeline Architecture
+### Technical Requirements
 
-```mermaid
-graph LR
-    %% Data Ingestion & Indexing
-    subgraph Indexing
-        C[The Odyssey Text] --> D[Preprocessing]
-        D --> E[Vector Embedding]
-        E --> F[Vector Store]
-    end
+- Python >= 3.13
+- Key Dependencies:
+  - OpenAI API client
+  - Qdrant for vector storage
+  - Haystack AI (v2.7.0+) for RAG pipeline
+  - Pandas & NumPy for data processing
+  - Rich for CLI interface
+  - Pydantic for data validation and structured output generation
 
-    %% Query Processing
-    subgraph Retrieval
-        A[Mrs Dalloway Text] --> B[Preprocessing]
-        B --> G[Query Chunk]
-        G --> H[Query Embedding]
-        H --> I[Semantic Search]
-        F --> I
-        I --> J[Retrieved Chunks]
-    end
+For the complete list of dependencies, see `pyproject.toml`.
 
-    %% Generation
-    subgraph Generation
-        J --> K[Context Assembly]
-        G --> K
-        K --> M[Naive System Prompt]
-        K --> N[Expert System Prompt]
-        M --> O[LLM Analysis]
-        N --> O
-        O --> P[Intertextual Analysis]
-    end
+### Installation Requirements
 
-    style Indexing fill:#f0f7ff,stroke:#333
-    style Retrieval fill:#fff0f0,stroke:#333
-    style Generation fill:#f0fff0,stroke:#333
+1. Environment Setup:
+```bash
+git clone https://github.com/yourusername/woolf-intertextuality.git
+cd woolf-intertextuality
+
+# Optional: Create virtual environment with correct Python version
+python -m venv .venv
+source .venv/bin/activate  # On Unix
+# or
+.venv\Scripts\activate  # On Windows
 ```
 
-## Installation
+2. Dependency Installation:
+```bash
+# Using pip
+pip install -r requirements.txt
 
-1. Clone the repository:
+# Using uv
+uv sync
+```
 
-    ```bash
-    git clone https://github.com/yourusername/woolf-intertextuality.git
-    cd woolf-intertextuality
-    ```
+3. Configuration:
+```bash
+cp .env.example .env
+# Configure environment variables according to documentation
+```
 
-2. Install dependencies:
+### Methodological Execution
 
-    ```bash
-    # using pip
-    pip install -r requirements.txt
-    ```
-
-    ```bash
-    # using uv
-    uv sync
-    ```
-
-3. Set up environment variables
-
-    ```bash
-    cp .env.example .env
-    # Edit .env with your OpenAI API key
-    ```
-
-## Usage
-
-The analysis can be run directly using `main.py`:
+The analysis pipeline can be executed using the following commands:
 
 ```bash
-# Run analysis on all chunks with default settings (expert prompt)
+# 1. Generate analysis files
+# Run expert analysis
 python -m src.main
 
-# Run analysis with naive prompt
+# Run naive analysis
 python -m src.main --prompt-template naive_prompt
 
-# Run analysis with expert prompt (explicit)
-python -m src.main --prompt-template expert_prompt
+# 2. Create evaluation template
+# Combines both analyses and prepares template
+python -m src.evaluation.create_eval_csv
 
-# Limit analysis to first N chunks (for testing and money saving reasons)
+# 3. Run evaluations
+# Full evaluation
+python -m src.evaluation.evaluate_analyses
+
+# Or test with single row
+python -m src.evaluation.evaluate_analyses --test
+
+# Controlled experiment with limited scope
 python -m src.main --limit 5
-
-# Combine options
-python -m src.main --prompt-template naive_prompt --limit 5
 ```
 
-The script will:
+### Output Structure
 
-1. Load and preprocess both texts
-2. Index The Odyssey chunks for similarity search
-3. Process each Mrs Dalloway chunk to find similar passages
-4. Perform intertextual analysis using the specified prompt template
-5. Save results to a timestamped CSV file in `data/results/`
+The analysis generates two categories of data:
 
-### Output
-
-Results are saved as CSV files with the following information for each analyzed pair:
-
-- Passage texts and metadata
-- Similarity scores
-- Intertextual reference analysis including:
-  - Subtle integration patterns
-  - Multiple operational levels (linguistic, structural, etc.)
-  - Feminist transformations
-  - Homeric elements
-- Confidence levels
-- Supporting textual evidence
-- Detailed reasoning and counter-arguments
-
-Example output path: `data/results/intertextual_analysis_20240315T143022.csv`
-
-Example output:
-
-**To be added**
-
-## Configuration
-
-Key settings can be configured in `src/config/settings.py` or via environment variables (see `.env.example`):
-
-- LLM parameters (model, temperature, max tokens)
-- Embedding settings
-- Preprocessing parameters (chunk size, overlap)
-- File paths and storage locations
-
-### Evaluation Output
-
-The system generates two types of output files:
-
-1. **Analysis Results** (`data/results/`):
-   - Raw analysis output from both Naive and Expert prompts
-   - Includes similarity scores, textual comparisons, and detailed analyses
-   - Format: `intertextual_analysis_{prompt_type}_{model}_{timestamp}.csv`
-
-2. **Annotation Files** (`data/evaluation/`):
-   - Anonymized outputs for blind classification
-   - Answer key mapping analysis IDs to prompt types
+1. **Primary Analysis Data** (`data/results/`):
+   - Passage-level comparisons with similarity metrics
+   - Structured analytical content
    - Format: 
-     - `annotation_ready_{analysis_file}.csv`
-     - `answer_key_{analysis_file}.csv`
+     - Analysis results: `intertextual_analysis_{prompt_type}_{model}_{timestamp}.csv`
 
-The annotation CSV facilitates:
-- Blind classification of outputs as Naive/Expert
-- Documentation of thematic and surface-level observations
-- Collection of annotator justifications
-- Tracking of inter-annotator agreement
+2. **Evaluation Materials** (`data/evaluation/`):
+   - Blind review protocols
+   - Inter-annotator agreement data
+   - Methodological validation metrics
+   - Format:
+     - Evaluation template: `evaluation_template.csv`
+     - Final evaluation: `evaluation_result.csv`
 
-## Development
+### Evaluation Workflow
 
-### Testing
+The evaluation process follows these steps:
 
-Tests are written using pytest and can be run with:
-
-```bash
-# Run all tests
-uv run pytest
-
-# Run with coverage report
-uv run pytest --cov=src tests/
-
-# Run specific test file
-uv run pytest tests/test_pipeline_steps.py
-
-# Run specific test
-uv run pytest tests/test_pipeline_steps.py::test_analysis_step
-```
-
-The test suite includes:
-- Unit tests for all pipeline components
-- Integration tests for the full analysis pipeline
-- Mock OpenAI responses to avoid API calls during testing
-
-### Code Quality
-
-This project uses Ruff for linting and formatting. Ruff combines the functionality of multiple Python linters (like flake8, black, isort) into a single fast tool.
-
-#### Installing Ruff
-
-```bash
-# Install Ruff as a development tool
-uv tool install ruff
-
-# Or upgrade to latest version
-uv tool upgrade ruff
-```
-
-```bash
-# Run linter
-uv run ruff check .
-
-# Auto-fix linting issues
-uv run ruff check --fix .
-
-# Format code
-uv run ruff format .
-```
-
-Ruff is configured in `pyproject.toml` with the following settings:
-- Line length: 88 characters (same as Black)
-- Python target version: 3.9+
-- Enabled rules:
-  - E4, E7, E9: Essential error checks
-  - F: PyFlakes error detection
-
-### Continuous Integration
-
-GitHub Actions automatically run tests and linting on all pull requests and pushes to main. The workflow:
-1. Runs the full test suite
-2. Generates a coverage report
-3. Checks code formatting with Ruff
-4. Ensures all tests pass before merging
-
-To run all checks locally before committing:
-```bash
-# Sync project dependencies including dev dependencies
-uv sync --all-extras --dev
-
-# Run all checks
-uv run pytest && uv run ruff check . && uv run ruff format --check .
-```
-
-### Project Structure
-
-The project follows standard Python project structure:
-```
-.
-├── .venv                  # Virtual environment (created by uv)
-├── .python-version        # Python version specification
-├── pyproject.toml         # Project metadata and dependencies
-├── uv.lock               # Lockfile for reproducible installations
-├── src/                  # Source code
-├── tests/                # Test files
-└── data/                 # Data files
-```
-
-For more details on project structure and management with uv, see the [uv documentation](https://docs.astral.sh/uv/).
-
+1. Generate analysis files using both expert and naive prompts
+2. Create evaluation template by combining both analyses
+3. Run evaluations using GPT-4 to assess:
+   - Evidence Quality (1-5 scale)
+   - Theoretical Alignment (1-5 scale)
+   - Internal Consistency (1-5 scale)
+   - Additional Notes (optional observations)

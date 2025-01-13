@@ -15,3 +15,7 @@ data/evaluation
 hoff.md
 evaluation
 *.csv
+writing/*
+# Keep the template files but ignore evaluation results
+evaluation_result*.csv
+analysis_evaluations_*.csv

@@ -9,7 +9,6 @@ from datetime import datetime
 from src.pipeline.pipeline_facade import PipelineFacade
 from src.data_preparation.data_manager import DataManager
 from src.config.settings import settings
-from src.evaluation.prepare_annotation_data import prepare_annotation_csv
 from src.utils.token_counter import TokenCounter
 import csv
 import json
@@ -66,7 +65,6 @@ def display_settings_table():
 def process_analysis_results(analysis: Analysis, query_text: str, doc: Document):
     """Convert analysis to dictionary format for DataFrame"""
     return {
-        # Core metadata
         "dalloway_text": query_text,
         "odyssey_text": doc.content,
         "odyssey_chapter": doc.meta.get("chapter", ""),
@@ -74,10 +72,8 @@ def process_analysis_results(analysis: Analysis, query_text: str, doc: Document)
         "similarity_type": doc.meta["similarity_type"],
         "prompt_type": settings.llm.prompt_template,
         
-        # Analysis components
         "initial_observations": analysis.initial_observations,
         
-        # Convert Pydantic models to dictionaries for JSON serialization
         "thinking_steps": json.dumps([step.model_dump() for step in analysis.thinking_steps]),
         "connections": json.dumps([conn.model_dump() for conn in analysis.connections]),
         "evaluation": json.dumps(analysis.evaluation.model_dump()),
@@ -87,7 +83,6 @@ def process_analysis_results(analysis: Analysis, query_text: str, doc: Document)
 def main():
     args = parse_args()
 
-    # Override prompt template if specified in command line
     if args.prompt_template:
         settings.llm.prompt_template = args.prompt_template
 
@@ -157,38 +152,29 @@ def main():
     )
     output_path = output_dir / output_filename
 
-    # Update column order for DataFrame
     column_order = [
-        # Core metadata
         "dalloway_text",
         "odyssey_text",
         "odyssey_chapter",
         "similarity_score",
         "similarity_type",
         "prompt_type",
-        # Analysis components
         "initial_observations",
         "thinking_steps",
         "connections",
-        # Evaluation only (remove summary)
         "evaluation"
     ]
 
     df = pd.DataFrame(results)
     
-    # Ensure all columns exist and are in correct order
     existing_columns = [col for col in column_order if col in df.columns]
     remaining_columns = [col for col in df.columns if col not in column_order]
     df = df[existing_columns + remaining_columns]
 
-    # Save results
     df.to_csv(output_path, index=False, encoding="utf-8")
     console.print(
         f"\n[bold green]✅ Analysis results saved to {output_path}[/bold green]"
     )
-
-    annotation_path = prepare_annotation_csv(output_path)
-    console.log(f"[green]✓[/green] Prepared annotation file: {annotation_path}")
 
     token_counter.print_usage_report()
 
