@@ -81,8 +81,9 @@ python -m src.main --prompt-template expert_prompt
 
 # Run naive analysis
 python -m src.main --prompt-template naive_prompt
-
-# Run expert analysis with a limit
+# Run expert analysis
+python -m src.main --prompt-template expert_prompt
+# Run expert analysis with a limit 
 python -m src.main --limit 5 --prompt-template expert_prompt
 
 # 2. Prepare evaluation template
